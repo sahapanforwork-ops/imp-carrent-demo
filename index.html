@@ -1,0 +1,1904 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ffffff">
+<title>เดโมหลังบ้าน IMP CarRent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@600;700&family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap">
+<style>
+/* IMP CarRent หลังบ้าน
+   แนวคิด: รถ 10 คันคือตัวเอก (ป้ายทะเบียนไทย) · "วันนี้" มาก่อน · อ่านออกกลางแดด · สีใช้บอกสถานะเท่านั้น */
+:root {
+  --asphalt: #e9ecef;      /* พื้นหลัง เทาถนน */
+  --asphalt-2: #dfe3e7;
+  --surface: #ffffff;
+  --ink: #14181f;
+  --ink-2: #3a424e;
+  --muted: #5d6673;
+  --rule: #d3d8de;
+  --volt: #cff24b;         /* สีแบรนด์ ใช้กับ "รถว่าง" และปุ่มหลักปุ่มเดียว */
+  --volt-ink: #3d5200;
+  --hold: #e8a317;   --hold-bg: #fdf1d6;
+  --confirmed: #2f6fed; --confirmed-bg: #e3ecfd;
+  --active: #1f9d55; --active-bg: #dcf3e5;
+  --monthly: #7c5cd6; --monthly-bg: #ece6fb;
+  --maint: #7b8594;  --maint-bg: #e8ebef;
+  --bad: #d23f37;    --bad-bg: #fde4e2;
+  --link: #2352d8;
+  --focus: #2352d8;
+  --r-sm: 8px; --r: 14px; --r-lg: 20px;
+  --font-display: "Anuphan", "IBM Plex Sans Thai", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans Thai", "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --side: 232px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--asphalt); color: var(--ink); }
+body { font-family: var(--font-body); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: var(--link); text-underline-offset: 3px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.boot { padding: 48px; text-align: center; color: var(--muted); }
+.num, .tbl td.num, b, strong { font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- app shell */
+.top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px; height: 56px;
+  padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--rule); }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 18px; text-decoration: none; color: var(--ink); }
+.brand-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--ink); color: var(--volt); }
+.brand-mark svg { width: 16px; height: 16px; }
+.top .who { margin-left: auto; text-align: right; line-height: 1.25; font-size: 14px; }
+.top .who small { display: block; color: var(--muted); font-size: 12px; }
+.top .icon-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--rule); background: var(--surface); display: grid; place-items: center; cursor: pointer; }
+.top .icon-btn svg { width: 18px; height: 18px; }
+
+nav.tabs { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-around;
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--rule); }
+nav.tabs a { position: relative; flex: 1; display: grid; justify-items: center; gap: 2px; padding: 6px 2px; border-radius: 10px;
+  color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 600; }
+nav.tabs a svg { width: 22px; height: 22px; }
+nav.tabs a[aria-current="page"] { color: var(--ink); background: var(--asphalt); }
+nav.tabs a.more-only { display: none; }
+nav.tabs .badge { position: absolute; top: 2px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+  background: var(--bad); color: #fff; font-size: 11px; line-height: 18px; text-align: center; }
+.more-sheet { position: fixed; z-index: 45; left: 8px; right: 8px; bottom: calc(70px + env(safe-area-inset-bottom)); padding: 8px;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-lg); box-shadow: 0 18px 40px -12px rgba(20, 24, 31, .35); }
+.more-sheet[hidden] { display: none; }
+.more-sheet a { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; color: var(--ink); text-decoration: none; font-weight: 600; }
+.more-sheet a:hover, .more-sheet a[aria-current="page"] { background: var(--asphalt); }
+.more-sheet svg { width: 20px; height: 20px; color: var(--muted); }
+
+main { max-width: 1120px; margin: 0 auto; padding: 20px 16px 120px; }
+@media (min-width: 900px) {
+  .top { position: fixed; left: 0; top: 0; bottom: 0; width: var(--side); height: auto; flex-direction: column; align-items: stretch;
+    gap: 0; padding: 18px 14px; border-right: 1px solid var(--rule); border-bottom: 0; }
+  .brand { padding: 0 6px 18px; }
+  .top .who { order: 3; margin: auto 0 0; text-align: left; padding: 14px 6px 10px; border-top: 1px solid var(--rule); }
+  .top .icon-btn { order: 4; width: 100%; height: 38px; display: flex; gap: 8px; justify-content: center; font-size: 14px; }
+  .top .icon-btn::after { content: "ออกจากระบบ"; }
+  nav.tabs { position: fixed; z-index: 31; top: 74px; left: 0; right: auto; bottom: auto; width: var(--side); display: grid; gap: 2px;
+    justify-content: stretch; padding: 0 14px; background: transparent; border: 0; }
+  nav.tabs a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 15px; justify-items: start; }
+  nav.tabs a.more-only { display: flex; }
+  nav.tabs a.more-btn { display: none; }
+  nav.tabs .badge { position: static; margin-left: auto; }
+  .more-sheet { display: none !important; }
+  main { margin-left: var(--side); padding: 28px 32px 64px; }
+}
+
+/* ---------------------------------------------------------------- type + basics */
+h1 { font-family: var(--font-display); font-size: 28px; line-height: 1.2; letter-spacing: -0.01em; margin: 0; }
+h2 { font-family: var(--font-display); font-size: 19px; line-height: 1.3; margin: 32px 0 12px; }
+.page-head { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.page-head .sub { color: var(--muted); font-size: 15px; }
+.page-head .actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--rule); border-radius: var(--r); }
+.back { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); text-decoration: none; font-weight: 600; margin-bottom: 10px; }
+
+/* ---------------------------------------------------------------- ป้ายทะเบียน (ตัวเอกของหน้า) */
+.plate { display: inline-grid; min-width: 96px; padding: 3px 10px 2px; border: 2px solid var(--ink); border-radius: 6px; background: #fff;
+  text-align: center; line-height: 1.05; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px rgba(20, 24, 31, .25); }
+.plate b { font-family: var(--font-display); font-size: 17px; font-weight: 700; letter-spacing: .01em; }
+.plate small { font-size: 10.5px; color: var(--ink-2); white-space: nowrap; }
+.plate.sm { min-width: 76px; padding: 1px 7px 0; border-width: 1.5px; }
+.plate.sm b { font-size: 14px; }
+.plate.sm small { font-size: 9.5px; }
+.swatch { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(20, 24, 31, .25); vertical-align: -1px; }
+
+/* กระดานรถวันนี้ */
+.board { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.slot { position: relative; display: grid; gap: 8px; padding: 12px 12px 10px; background: var(--surface); border-radius: var(--r);
+  border: 1px solid var(--rule); text-decoration: none; color: inherit; overflow: hidden; }
+.slot::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--st, var(--maint)); }
+.slot .state { font-weight: 700; font-size: 14px; color: var(--st-ink, var(--ink)); }
+.slot .who { font-size: 13px; color: var(--muted); min-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot.free { --st: var(--volt); --st-ink: var(--volt-ink); background: linear-gradient(0deg, #fbfde9, #fff 60%); }
+.slot.hold { --st: var(--hold); }
+.slot.confirmed { --st: var(--confirmed); }
+.slot.active { --st: var(--active); --st-ink: var(--active); }
+.slot.monthly { --st: var(--monthly); --st-ink: var(--monthly); }
+.slot.maintenance { --st: var(--maint); }
+.slot.late { --st: var(--bad); --st-ink: var(--bad); }
+.board-legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+.board-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: 0; }
+
+/* งานวันนี้ */
+.today-sum { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 6px 0 20px; font-size: 15px; color: var(--ink-2); }
+.today-sum b { font-family: var(--font-display); font-size: 20px; margin-right: 4px; }
+.today-sum .alert b { color: var(--bad); }
+.tasks { display: grid; gap: 8px; }
+.task { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; background: var(--surface);
+  border: 1px solid var(--rule); border-radius: var(--r); }
+.task .what { font-weight: 700; }
+.task .what a { color: inherit; text-decoration: none; }
+.task .meta { font-size: 14px; color: var(--muted); }
+.task .go { display: flex; gap: 6px; }
+.task.late { border-color: #f1b8b4; background: #fffafa; }
+.kind { display: inline-block; font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: var(--asphalt); color: var(--ink-2); white-space: nowrap; }
+.kind.out { background: var(--confirmed-bg); color: var(--confirmed); }
+.kind.in { background: var(--active-bg); color: var(--active); }
+.kind.late, .kind.money { background: var(--bad-bg); color: var(--bad); }
+.kind.req { background: var(--hold-bg); color: #8a5a00; }
+
+/* ---------------------------------------------------------------- สถานะ */
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  background: var(--asphalt); color: var(--ink-2); white-space: nowrap; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .9; }
+.pill.new, .pill.hold { background: var(--hold-bg); color: #8a5a00; }
+.pill.contacted, .pill.confirmed { background: var(--confirmed-bg); color: var(--confirmed); }
+.pill.active, .pill.paid { background: var(--active-bg); color: var(--active); }
+.pill.monthly { background: var(--monthly-bg); color: var(--monthly); }
+.pill.maintenance { background: var(--maint-bg); color: var(--maint); }
+.pill.returned, .pill.converted { background: #eef1f3; color: var(--muted); }
+.pill.due { background: var(--bad-bg); color: var(--bad); }
+.pill.cancelled, .pill.rejected, .pill.spam, .pill.void { background: transparent; color: #8b939e; text-decoration: line-through; }
+.pill.free { background: #f3fbd0; color: var(--volt-ink); }
+
+/* ---------------------------------------------------------------- กล่อง รายการ ตาราง */
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px; }
+.card + .card { margin-top: 12px; }
+.list { display: grid; gap: 8px; }
+.item { display: block; position: relative; padding: 14px 16px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r);
+  color: inherit; text-decoration: none; }
+a.item:hover { border-color: var(--ink-2); }
+.item .title, .item a.title { font-weight: 700; color: var(--ink); text-decoration: none; }
+.item .line { margin-top: 2px; }
+.item .meta { font-size: 14px; color: var(--muted); }
+.item .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.req .quote { margin: 8px 0 0; padding: 8px 12px; border-left: 3px solid var(--rule); background: #f7f8f9; border-radius: 0 8px 8px 0; font-size: 15px; }
+.kv { display: grid; grid-template-columns: 110px 1fr; gap: 8px 14px; margin: 0; }
+.kv dt { color: var(--muted); font-size: 14px; padding-top: 2px; }
+.kv dd { margin: 0; }
+.money-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px; margin-top: 14px; background: var(--rule);
+  border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
+.money-strip div { background: var(--surface); padding: 12px 14px; }
+.money-strip span { display: block; font-size: 13px; color: var(--muted); }
+.money-strip b { font-family: var(--font-display); font-size: 21px; }
+.money-strip .owe b { color: var(--bad); }
+.money-strip .ok b { color: var(--active); }
+.tbl { width: 100%; border-collapse: collapse; background: var(--surface); }
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--r); background: var(--surface); }
+.tbl th, .tbl td { padding: 10px 14px; border-bottom: 1px solid #eceff2; text-align: left; vertical-align: middle; font-size: 15px; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl th { font-size: 13px; font-weight: 600; color: var(--muted); background: #f7f8f9; white-space: nowrap; }
+.tbl td.num, .tbl th.num { text-align: right; white-space: nowrap; }
+.tbl tbody tr:hover { background: #fafbfc; }
+.tbl .late { color: var(--bad); font-weight: 700; }
+.scroll-x { overflow-x: auto; }
+.search { max-width: 380px; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.seg { display: inline-flex; padding: 3px; border-radius: 12px; background: var(--asphalt-2); }
+.seg button { border: 0; background: transparent; padding: 7px 14px; border-radius: 9px; font-weight: 600; font-size: 14px; color: var(--ink-2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(20, 24, 31, .12); }
+
+/* ---------------------------------------------------------------- ฟอร์ม ปุ่ม */
+label.f { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+label.f > span { color: var(--ink); font-weight: 600; font-size: 15px; }
+input, select, textarea { width: 100%; min-height: 46px; padding: 10px 12px; border: 1.5px solid #c9cfd6; border-radius: 10px; background: #fff; }
+input:hover, select:hover, textarea:hover { border-color: #aab2bc; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px rgba(35, 82, 216, .15); }
+input:disabled, select:disabled { background: #f1f3f5; color: #7b8594; }
+input[type="checkbox"] { width: 20px; min-height: 20px; height: 20px; accent-color: var(--ink); }
+textarea { min-height: 84px; resize: vertical; }
+fieldset { border: 1px solid var(--rule); border-radius: var(--r); padding: 12px 14px; margin: 0; }
+legend { padding: 0 6px; font-size: 14px; color: var(--muted); }
+.form { display: grid; gap: 14px; }
+.form .two { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 9px 16px; border-radius: 11px;
+  border: 1.5px solid #c9cfd6; background: var(--surface); color: var(--ink); cursor: pointer; text-decoration: none; font-weight: 700; font-size: 15px; white-space: nowrap; }
+.btn:hover { border-color: var(--ink-2); }
+.btn svg { width: 18px; height: 18px; }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+.btn.primary:hover { background: #2a313c; }
+.btn.brand { background: var(--volt); border-color: #b9dc35; color: var(--ink); }
+.btn.danger { color: var(--bad); border-color: #efc2bf; }
+.btn.danger:hover { background: var(--bad-bg); }
+.btn.small { min-height: 36px; padding: 5px 12px; font-size: 14px; border-radius: 9px; }
+.btn.call { color: var(--active); border-color: #b5e3c6; }
+.btn:disabled { opacity: .5; cursor: progress; }
+.hint { font-size: 14px; color: var(--muted); margin: 0; }
+.total { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+
+/* ---------------------------------------------------------------- ปฏิทินรถ */
+.cal { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); }
+.cal table { border-collapse: separate; border-spacing: 0; }
+.cal th, .cal td { height: 44px; min-width: 34px; padding: 0; text-align: center; font-size: 12px; border-bottom: 1px solid #eef0f3; }
+.cal th.car { position: sticky; left: 0; z-index: 2; min-width: 112px; padding: 0 10px; background: var(--surface); border-right: 1px solid var(--rule); text-align: left; }
+.cal thead th { position: sticky; top: 0; z-index: 1; height: 48px; background: #f7f8f9; font-weight: 600; line-height: 1.15; color: var(--ink-2); }
+.cal thead th.car { z-index: 3; }
+.cal thead th.wkend { color: var(--bad); }
+.cal thead th small { display: block; font-size: 10px; font-weight: 700; color: var(--muted); }
+.cal thead th.today small { color: var(--volt); }
+.cal thead th.today { background: var(--ink); color: #fff; border-radius: 0 0 8px 8px; }
+.cal td { cursor: pointer; border-right: 1px solid #f3f4f6; }
+.cal td:not(.b):hover { background: #f3fbd0; box-shadow: inset 0 0 0 2px var(--volt); }
+.cal td.b { position: relative; padding: 6px 0; }
+.cal td.b span { display: block; height: 30px; margin: 0 -1px; background: var(--bar); color: #fff; font-size: 12px; font-weight: 700; line-height: 30px;
+  text-align: left; padding-left: 6px; white-space: nowrap; overflow: visible; }
+.cal td.b.s span { position: relative; z-index: 1; margin-left: 3px; border-radius: 8px 0 0 8px; }
+.cal td.b.e span { margin-right: 3px; border-radius: 0 8px 8px 0; }
+.cal td.b.s.e span { border-radius: 8px; }
+.cal td.b.hold { --bar: var(--hold); }
+.cal td.b.hold span { color: #3d2a00; }
+.cal td.b.confirmed { --bar: var(--confirmed); }
+.cal td.b.active { --bar: var(--active); }
+.cal td.b.monthly { --bar: var(--monthly); }
+.cal td.b.maintenance { --bar: repeating-linear-gradient(135deg, #9aa3af 0 6px, #b6bdc6 6px 12px); }
+.cal td.b:hover span { filter: brightness(1.08); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.legend i { display: inline-block; width: 18px; height: 10px; border-radius: 5px; margin-right: 6px; vertical-align: 0; }
+
+/* ---------------------------------------------------------------- สถิติเว็บ (กราฟสีเดียว แท่งบาง ปลายมน 4px ชิดฐาน) */
+.vchart { position: relative; padding: 18px 0 0; }
+.vchart__max { position: absolute; top: 0; left: 0; font-size: 12px; color: var(--muted); }
+.vchart__bars { display: flex; align-items: flex-end; gap: 2px; height: 180px; border-bottom: 1px solid var(--rule); background:
+  linear-gradient(to bottom, transparent calc(50% - .5px), #eef0f3 calc(50% - .5px), #eef0f3 calc(50% + .5px), transparent calc(50% + .5px)); }
+.vchart__col { flex: 1; height: 100%; display: flex; align-items: flex-end; cursor: default; }
+.vchart__col i { display: block; width: 100%; max-width: 22px; margin: 0 auto; background: var(--ink-2); border-radius: 4px 4px 0 0; }
+.vchart__col:hover i { background: var(--ink); }
+.vchart__x { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: var(--muted); }
+.hbars { display: grid; gap: 10px; }
+.hbar { display: grid; grid-template-columns: minmax(110px, 38%) 1fr auto; gap: 12px; align-items: center; font-size: 14px; }
+.hbar__label { overflow: hidden; text-overflow: ellipsis; }
+.hbar__track { height: 12px; border-radius: 0 4px 4px 0; background: #eef0f3; }
+.hbar__track i { display: block; height: 100%; background: var(--ink-2); border-radius: 0 4px 4px 0; }
+.hbar:hover .hbar__track i { background: var(--ink); }
+.hbar__val { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.hbar__val small { font-weight: 600; color: var(--muted); margin-left: 4px; }
+.two-col { display: grid; gap: 0 20px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 760px) { .two-col { grid-template-columns: minmax(0, 1fr); } .hbar { grid-template-columns: minmax(90px, 42%) 1fr auto; } }
+.tip { position: fixed; z-index: 120; pointer-events: none; max-width: 260px; padding: 6px 10px; border-radius: 8px; background: var(--ink); color: #fff; font-size: 13px; }
+
+/* ---------------------------------------------------------------- dialog + toast + login */
+dialog#modal { width: min(600px, 100vw); max-height: 92vh; margin: auto auto 0; border: 0; border-radius: 22px 22px 0 0; padding: 0; }
+@media (min-width: 700px) { dialog#modal { margin: auto; border-radius: 22px; } }
+dialog#modal::backdrop { background: rgba(20, 24, 31, .5); }
+#modal-body { padding: 22px 20px 24px; }
+#modal-body h2 { margin: 0 0 16px; font-size: 22px; }
+dialog[open] #modal-body { animation: rise .18s ease-out; }
+@keyframes rise { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { dialog[open] #modal-body { animation: none; } }
+#toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 100; display: grid; gap: 8px; width: min(460px, 92vw); }
+#toast div { background: var(--ink); color: #fff; padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px -10px rgba(20, 24, 31, .5); font-weight: 600; }
+#toast div.err { background: var(--bad); }
+@media (min-width: 900px) { #toast { bottom: 24px; left: calc(50% + var(--side) / 2); } }
+
+.login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.login { width: min(400px, 100%); background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-lg); padding: 28px 24px; }
+.login .brand { margin-bottom: 6px; }
+.login h1 { font-size: 24px; margin: 18px 0 4px; }
+.login p { color: var(--muted); margin: 0 0 18px; }
+
+@media (max-width: 560px) {
+  .form .two { grid-template-columns: 1fr; }
+  .hide-sm { display: none; }
+  h1 { font-size: 24px; }
+  .task { grid-template-columns: 1fr auto; }
+  .task .kind { grid-column: 1 / -1; justify-self: start; }
+  .kv { grid-template-columns: 92px 1fr; }
+}
+@media print {
+  .top, nav.tabs, .no-print, #toast, .more-sheet { display: none !important; }
+  body, main { background: #fff; margin: 0; padding: 0; }
+  .card, .tbl-wrap { border: 0; }
+}
+
+</style>
+</head>
+<body>
+<div id="app" aria-live="polite"><p class="boot">กำลังโหลด…</p></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="modal"><div id="modal-body"></div></dialog>
+<noscript>ต้องเปิด JavaScript เพื่อใช้ระบบหลังบ้าน</noscript>
+<script>
+window.IMP_ADMIN = {"url": "https://demo.supabase.co", "anonKey": "demo", "brand": "IMP CarRent", "colors": [{"slug": "graphite-grey", "name_th": "สีเทา", "hex": "#6E7277"}, {"slug": "frost-white", "name_th": "สีขาว", "hex": "#EDEDED"}, {"slug": "coastal-cream", "name_th": "สีครีม", "hex": "#C9C2AF"}]};
+</script>
+<script>
+// โหมดตัวอย่างของระบบหลังบ้าน: จำลอง Supabase ในเบราว์เซอร์ ข้อมูลสมมติทั้งหมด (รีเฟรชหน้า = เริ่มใหม่)
+(function () {
+  const bkk = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+  const T0 = bkk();
+  const D = (n) => { const d = new Date(T0 + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const M = (iso, n) => { const d = new Date(iso + "T00:00:00Z"); const day = d.getUTCDate(); const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1));
+    const last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate(); t.setUTCDate(Math.min(day, last)); return t.toISOString().slice(0, 10); };
+  const now = () => new Date().toISOString();
+  let ROLE = "owner";
+  try { ROLE = window.name === "imp-demo-staff" ? "staff" : "owner"; } catch (e) { /* default owner */ }
+  const ME = ROLE === "owner" ? "u1" : "u2";
+  let seq = 1000;
+  const id = () => ++seq;
+
+  const DB = {
+    staff: [{ user_id: "u1", name: "เฮียต้อม", role: "owner", active: true, created_at: "2026-11-01" },
+      { user_id: "u2", name: "น้องเอ", role: "staff", active: true, created_at: "2026-11-02" }],
+    settings: [{ id: true, daily_price: 1300, monthly_price: 24000, min_months: 6, reservation_fee: 1000, doc_retention_days: 90 }],
+    cars: [
+      ["graphite-grey", "1กข 1001", -200], ["frost-white", "1กข 1002", -200], ["coastal-cream", "1กข 1003", -180], ["graphite-grey", "1กข 1004", -150],
+      ["frost-white", "1กข 1005", -150], ["coastal-cream", "1กข 1006", -120], ["graphite-grey", "1กข 1007", -90], ["frost-white", "1กข 1008", -4],
+      ["coastal-cream", "1กข 1009", -4], ["graphite-grey", "1กข 1010", -4],
+    ].map(([color, plate, a], i) => ({ id: i + 1, no: i + 1, color, plate, arrived: D(a), active: true, note: null })),
+    customers: [
+      { id: 1, full_name: "สมชาย ใจดี", phone: "0812345678", line_id: "somchai.j", id_card_no: "1100100123456", license_type: "public", license_expiry: D(400), address: "ลาดพร้าว กรุงเทพฯ" },
+      { id: 2, full_name: "วิภา ศรีสุข", phone: "0898765432", line_id: "wipa", id_card_no: "1209900765432", license_type: "private", license_expiry: D(-3), address: "บางนา กรุงเทพฯ" },
+      { id: 3, full_name: "ธนพล มั่นคง", phone: "0861112222", line_id: null, id_card_no: "3100500111222", license_type: "public", license_expiry: D(900), address: "รังสิต ปทุมธานี" },
+      { id: 4, full_name: "กมล รักษ์ดี", phone: "0953334444", line_id: "kamon", id_card_no: "1103300333444", license_type: "public", license_expiry: D(700), address: "นนทบุรี" },
+    ].map((c) => Object.assign({ note: null, erased_at: null, created_at: "2026-11-10T08:00:00Z" }, c)),
+    bookings: [], payments: [], customer_documents: [], booking_requests: [], audit: [],
+  };
+  const cust = (i) => DB.customers.find((c) => c.id === i);
+  function addBooking(b) {
+    const s = DB.settings[0];
+    b = Object.assign({ id: id(), discount: 0, deposit: 0, note: null, damage_note: null, pickup_at: null, pickup_km: null, pickup_battery: null,
+      return_at: null, return_km: null, return_battery: null, created_at: now(), created_by: ME }, b);
+    if (b.kind === "monthly") { b.units = Number(b.units) || s.min_months; const e = new Date(M(b.start_date, b.units) + "T00:00:00Z"); e.setUTCDate(e.getUTCDate() - 1); b.end_date = e.toISOString().slice(0, 10); }
+    else b.units = Math.round((new Date(b.end_date) - new Date(b.start_date)) / 864e5) + 1;
+    if (b.kind === "maintenance") { b.unit_price = 0; b.discount = 0; b.deposit = 0; b.customer_id = null; }
+    if (b.kind !== "maintenance" && !b.contract_no) b.contract_no = "IMP" + b.start_date.slice(2, 4) + b.start_date.slice(5, 7) + "-" + String(b.id).slice(-4).padStart(4, "0");
+    const clash = DB.bookings.find((x) => x.car_id === b.car_id && ["hold", "confirmed", "active"].includes(x.status) && ["hold", "confirmed", "active"].includes(b.status)
+      && x.start_date <= b.end_date && b.start_date <= x.end_date);
+    if (clash) return { error: { code: "23P01", message: "bookings_no_overlap" } };
+    DB.bookings.push(b);
+    if (["confirmed", "active"].includes(b.status)) makeDues(b);
+    return { data: b };
+  }
+  function makeDues(b) {
+    if (b.kind === "maintenance" || DB.payments.some((p) => p.booking_id === b.id && p.kind === "rent")) return;
+    const reserved = DB.payments.filter((p) => p.booking_id === b.id && p.kind === "reservation" && p.status === "paid").reduce((s, p) => s + p.amount, 0);
+    const total = b.unit_price * b.units - b.discount;
+    if (b.kind === "daily") { if (total - reserved > 0) pay(b.id, "rent", total - reserved, b.start_date, "due"); }
+    else for (let i = 0; i < b.units; i++) { const a = b.unit_price - (i === 0 ? b.discount + reserved : 0); if (a > 0) pay(b.id, "rent", a, M(b.start_date, i), "due"); }
+    if (b.deposit > 0) pay(b.id, "deposit", b.deposit, b.start_date, "due");
+  }
+  function pay(booking_id, kind, amount, due_date, status, method = null, paid_at = null) {
+    const p = { id: id(), booking_id, kind, amount, due_date, status, method, paid_at: status === "paid" ? (paid_at || now()) : null, slip_path: null, note: null, created_at: now(), created_by: ME };
+    DB.payments.push(p); return p;
+  }
+  // ---- ข้อมูลตัวอย่าง
+  const b1 = addBooking({ car_id: 1, customer_id: 1, kind: "daily", status: "hold", start_date: D(0), end_date: D(2), unit_price: 1300, deposit: 3000 }).data;
+  pay(b1.id, "reservation", 1000, null, "paid", "transfer");
+  b1.status = "confirmed"; makeDues(b1);
+  const b2 = addBooking({ car_id: 2, customer_id: 2, kind: "daily", status: "active", start_date: D(-3), end_date: D(0), unit_price: 1300, deposit: 3000 }).data;
+  DB.payments.filter((p) => p.booking_id === b2.id).forEach((p) => { p.status = "paid"; p.paid_at = now(); p.method = "transfer"; });
+  b2.pickup_at = D(-3) + "T09:30:00+07:00"; b2.pickup_km = 18250; b2.pickup_battery = 95;
+  const b3 = addBooking({ car_id: 3, customer_id: 3, kind: "daily", status: "active", start_date: D(-6), end_date: D(-1), unit_price: 1300 }).data;
+  DB.payments.filter((p) => p.booking_id === b3.id).forEach((p) => { p.status = "paid"; p.paid_at = now(); p.method = "cash"; });
+  b3.pickup_at = D(-6) + "T10:00:00+07:00";
+  addBooking({ car_id: 4, customer_id: 4, kind: "daily", status: "confirmed", start_date: D(5), end_date: D(9), unit_price: 1300 });
+  addBooking({ car_id: 1, customer_id: 4, kind: "daily", status: "hold", start_date: D(8), end_date: D(10), unit_price: 1300 });
+  const m6 = addBooking({ car_id: 6, customer_id: 3, kind: "monthly", status: "active", start_date: D(-40), units: 6, unit_price: 24000, deposit: 10000 }).data;
+  DB.payments.filter((p) => p.booking_id === m6.id && (p.due_date <= D(-40) || p.kind === "deposit")).forEach((p) => { p.status = "paid"; p.paid_at = now(); p.method = "transfer"; });
+  const m7 = addBooking({ car_id: 7, customer_id: 1, kind: "monthly", status: "active", start_date: D(-70), units: 12, unit_price: 24000, deposit: 10000 }).data;
+  DB.payments.filter((p) => p.booking_id === m7.id && (p.due_date <= D(-40) || p.kind === "deposit")).forEach((p) => { p.status = "paid"; p.paid_at = now(); p.method = "promptpay"; });
+  addBooking({ car_id: 5, kind: "maintenance", status: "confirmed", start_date: D(2), end_date: D(3) });
+  DB.booking_requests = [
+    { id: 501, customer_id: 5, created_at: new Date(Date.now() - 25 * 60e3).toISOString(), plan: "monthly", start_date: D(7), days: null, months: 6, color: "frost-white", car_no: 8, usage: "ขับ Grab", name: "ต้น", phone: "0823456789", note: "มีใบขับขี่สาธารณะแล้ว อยากรับรถแถวรังสิต", source: { utm_source: "facebook", utm_campaign: "imp-messages", page: "/grab-monthly/" }, status: "new" },
+    { id: 502, created_at: new Date(Date.now() - 3 * 3600e3).toISOString(), plan: "daily", start_date: D(4), days: 3, months: null, color: "coastal-cream", car_no: null, usage: "ทริปต่างจังหวัด", name: "แพร", phone: "0845556666", note: "ไปหัวหิน 3 วัน", source: { page: "/rent-daily/" }, status: "new" },
+    { id: 503, created_at: new Date(Date.now() - 26 * 3600e3).toISOString(), plan: "daily", start_date: D(1), days: 1, months: null, color: "graphite-grey", car_no: 1, usage: "ใช้ส่วนตัว / ครอบครัว", name: "เจ", phone: "0867778888", note: null, source: { page: "/" }, status: "contacted", staff_note: "โทรแล้ว รอโอนมัดจำ" },
+  ].map((r) => Object.assign({ handled_by: null, handled_at: null, staff_note: null }, r));
+  DB.customers[0].source = "web"; DB.customers[1].source = "line"; DB.customers[1].line_user_id = "U" + "b".repeat(32);
+  DB.customers.push({ id: 5, full_name: "ต้น", phone: "0823456789", source: "web", note: "มาจากฟอร์มจองบนเว็บ", erased_at: null, created_at: new Date(Date.now() - 25 * 60e3).toISOString() },
+    { id: 6, full_name: "Nok 🌸".replace(/[^ -￿]/g, ""), phone: null, source: "line", line_user_id: "U" + "c".repeat(32), note: "มาจากแชต LINE OA", erased_at: null, created_at: new Date(Date.now() - 2 * 3600e3).toISOString() });
+  DB.booking_requests && DB.booking_requests.length;
+  DB.line_contacts = [
+    { user_id: "U" + "c".repeat(32), display_name: "Nok", picture_url: null, followed: true, first_seen_at: new Date(Date.now() - 2 * 3600e3).toISOString(), last_event_at: new Date(Date.now() - 2 * 3600e3).toISOString(), last_message: "สนใจเช่ารายเดือนขับ LINE MAN ค่ะ มีรถสีขาวว่างไหม", ref: null, customer_id: 6, request_id: null },
+    { user_id: "U" + "b".repeat(32), display_name: "วิภา", picture_url: null, followed: true, first_seen_at: "2026-11-15T08:00:00Z", last_event_at: new Date(Date.now() - 5 * 3600e3).toISOString(), last_message: "จองรถ REF-K7Q2M", ref: "REF-K7Q2M", customer_id: 2, request_id: null },
+    { user_id: "U" + "d".repeat(32), display_name: "Beam", picture_url: null, followed: true, first_seen_at: new Date(Date.now() - 86400e3).toISOString(), last_event_at: new Date(Date.now() - 86400e3).toISOString(), last_message: null, ref: null, customer_id: null, request_id: null },
+  ];
+  DB.customer_documents = [
+    { id: 701, customer_id: 1, kind: "id_card", storage_path: "customers/1/a.jpg", created_at: "2026-11-10T08:05:00Z" },
+    { id: 702, customer_id: 1, kind: "driver_license", storage_path: "customers/1/b.jpg", created_at: "2026-11-10T08:06:00Z" },
+  ];
+  DB.audit = [
+    { at: new Date(Date.now() - 3600e3).toISOString(), actor_name: "น้องเอ", tbl: "payments", row_id: "1003", action: "update", old_row: { status: "due" }, new_row: { status: "paid" } },
+    { at: new Date(Date.now() - 7200e3).toISOString(), actor_name: "เฮียต้อม", tbl: "bookings", row_id: String(b1.id), action: "insert", old_row: null, new_row: {} },
+  ];
+
+  // ---- มุมมอง (คำนวณสดเหมือน view ในฐานข้อมูล)
+  const vBookings = () => DB.bookings.map((b) => {
+    const c = DB.cars.find((x) => x.id === b.car_id) || {}; const cu = cust(b.customer_id) || {};
+    const ps = DB.payments.filter((p) => p.booking_id === b.id);
+    const sum = (f) => ps.filter(f).reduce((s, p) => s + p.amount, 0);
+    const total = b.unit_price * b.units - b.discount;
+    const paid = sum((p) => p.status === "paid" && (p.kind === "reservation" || p.kind === "rent"));
+    const dues = ps.filter((p) => p.status === "due").map((p) => p.due_date).sort();
+    return Object.assign({}, b, { total_price: total, car_no: c.no, car_color: c.color, car_plate: c.plate, customer_name: cu.full_name || null, customer_phone: cu.phone || null,
+      paid_rent: paid, outstanding: Math.max(total - paid, 0), deposit_held: sum((p) => p.status === "paid" && p.kind === "deposit") - sum((p) => p.status === "paid" && p.kind === "deposit_refund"),
+      damage_paid: sum((p) => p.status === "paid" && p.kind === "damage"), next_due_date: dues[0] || null });
+  });
+  const vDue = () => DB.payments.filter((p) => p.status === "due").map((p) => { const b = vBookings().find((x) => x.id === p.booking_id) || {};
+    return Object.assign({}, p, { contract_no: b.contract_no, booking_kind: b.kind, car_no: b.car_no, customer_name: b.customer_name, customer_phone: b.customer_phone }); });
+  const vDocsDue = () => [{ id: 799, customer_id: 9, kind: "driver_license", storage_path: "x", customer_name: "ลูกค้าเก่า (ตัวอย่าง)", delete_after: D(-2), created_at: "2026-06-01" }];
+  const source = (t) => ({ v_bookings: vBookings, v_payments_due: vDue, v_documents_due_for_deletion: vDocsDue }[t] || (() => DB[t] || []))();
+
+  function builder(table) {
+    const filters = []; let order = null, lim = null, one = false, op = null, payload = null, wantCount = false, head = false;
+    const b = {
+      select(_c, o) { if (o && o.count) wantCount = true; if (o && o.head) head = true; return b; },
+      eq(c, v) { filters.push((r) => String(r[c]) === String(v)); return b; },
+      in(c, vs) { filters.push((r) => vs.map(String).includes(String(r[c]))); return b; },
+      lt(c, v) { filters.push((r) => r[c] != null && r[c] < v); return b; }, lte(c, v) { filters.push((r) => r[c] != null && r[c] <= v); return b; },
+      gt(c, v) { filters.push((r) => r[c] != null && r[c] > v); return b; }, gte(c, v) { filters.push((r) => r[c] != null && r[c] >= v); return b; },
+      is(c, v) { filters.push((r) => (v === null ? r[c] == null : r[c] === v)); return b; },
+      or(expr) { const terms = expr.split(",").map((t) => t.split(".")); filters.push((r) => terms.some(([c, , pat]) => String(r[c] || "").toLowerCase().includes(String(pat || "").replace(/%/g, "").toLowerCase()))); return b; },
+      order(c, o) { if (!order) order = [c, !(o && o.ascending === false)]; return b; },
+      limit(n) { lim = n; return b; }, single() { one = true; return b; }, maybeSingle() { one = true; return b; },
+      insert(v) { op = "insert"; payload = v; return b; }, update(v) { op = "update"; payload = v; return b; },
+      upsert(v) { op = "upsert"; payload = v; return b; }, delete() { op = "delete"; return b; },
+      then(res, rej) { return Promise.resolve(run()).then(res, rej); },
+    };
+    function run() {
+      if (op === "insert") {
+        const rows = (Array.isArray(payload) ? payload : [payload]).map((v) => Object.assign({}, v));
+        const out = [];
+        for (const v of rows) {
+          if (table === "bookings") { const r = addBooking(v); if (r.error) return { data: null, error: r.error }; out.push(r.data); continue; }
+          if (table === "payments") { const p = pay(v.booking_id, v.kind, Number(v.amount), v.due_date || null, v.status || "paid", v.method); Object.assign(p, { note: v.note || null, slip_path: v.slip_path || null }); out.push(p); continue; }
+          if (table === "cars" && DB.cars.some((c) => c.no === v.no)) return { data: null, error: { code: "23505", message: "duplicate" } };
+          const r = Object.assign({ id: id(), created_at: now() }, v); (DB[table] = DB[table] || []).push(r); out.push(r);
+        }
+        return { data: one ? out[0] : out, error: null };
+      }
+      let rows = source(table).filter((r) => filters.every((f) => f(r)));
+      if (op === "update" || op === "upsert") {
+        if (table === "staff" && op === "upsert") { DB.staff.push(Object.assign({ created_at: now() }, payload)); return { data: payload, error: null }; }
+        const s = DB.settings[0];
+        for (const r of rows) {
+          const real = (DB[table] || []).find((x) => (x.id ?? x.user_id) === (r.id ?? r.user_id)) || r;
+          if (table === "bookings" && ROLE !== "owner" && ("unit_price" in payload || "discount" in payload)) return { data: null, error: { code: "42501", message: "พนักงานแก้ราคา ส่วนลด หรือประเภทการเช่าไม่ได้" } };
+          if (table === "payments" && ROLE !== "owner" && payload.status === "void") return { data: null, error: { code: "42501", message: "พนักงานบันทึกรับเงินงวดที่ค้างได้อย่างเดียว แก้ยอดหรือยกเลิกรายการให้เจ้าของทำ" } };
+          const old = real.status;
+          Object.assign(real, payload);
+          if (table === "payments" && payload.status === "paid" && !real.paid_at) real.paid_at = now();
+          if (table === "bookings") {
+            if (real.kind === "monthly" && payload.units) { const e = new Date(M(real.start_date, real.units) + "T00:00:00Z"); e.setUTCDate(e.getUTCDate() - 1); real.end_date = e.toISOString().slice(0, 10); }
+            else if (payload.end_date || payload.start_date) real.units = Math.round((new Date(real.end_date) - new Date(real.start_date)) / 864e5) + 1;
+            if (payload.status === "active" && !real.pickup_at) real.pickup_at = now();
+            if (payload.status === "returned" && !real.return_at) real.return_at = now();
+            if (payload.status === "confirmed" && old === "hold") makeDues(real);
+            if (payload.status === "cancelled") DB.payments.filter((p) => p.booking_id === real.id && p.status === "due").forEach((p) => { p.status = "void"; });
+          }
+          if (table === "settings") Object.assign(s, payload);
+        }
+        rows = source(table).filter((r) => filters.every((f) => f(r)));
+        return { data: one ? rows[0] || null : rows, error: null };
+      }
+      if (op === "delete") {
+        if (ROLE !== "owner") return { data: [], error: null };
+        const ids = new Set(rows.map((r) => r.id)); DB[table] = (DB[table] || []).filter((r) => !ids.has(r.id));
+        return { data: [], error: null };
+      }
+      if (order) { const [c, asc] = order; rows = rows.slice().sort((a, b2) => (a[c] > b2[c] ? 1 : a[c] < b2[c] ? -1 : 0) * (asc ? 1 : -1)); }
+      const count = rows.length;
+      if (lim) rows = rows.slice(0, lim);
+      return { data: head ? null : one ? rows[0] || null : rows, error: null, count: wantCount ? count : null };
+    }
+    return b;
+  }
+
+  function demoStats(days) {
+    let seed = 7;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    const by_day = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = D(-i); const wd = new Date(d + "T00:00:00Z").getUTCDay();
+      const pv = Math.round((wd === 0 || wd === 6 ? 70 : 48) + rnd() * 40 + (days - i) * 0.6);
+      by_day.push({ d, pageviews: pv, contacts: Math.round(pv * (0.03 + rnd() * 0.03)) });
+    }
+    const pageviews = by_day.reduce((a, x) => a + x.pageviews, 0);
+    const contactsAll = by_day.reduce((a, x) => a + x.contacts, 0);
+    const sessions = Math.round(pageviews * 0.42);
+    const k = pageviews / 2400;
+    return {
+      days, from: by_day[0].d,
+      totals: { pageviews, sessions, leads: Math.round(contactsAll * 0.35), line_clicks: Math.round(contactsAll * 0.5), call_clicks: Math.round(contactsAll * 0.15), contact_sessions: Math.round(sessions * 0.06) },
+      by_day,
+      funnel: { visited: sessions, engaged: Math.round(sessions * 0.46), form: Math.round(sessions * 0.11), contacted: Math.round(sessions * 0.06) },
+      sources: [
+        { source: "facebook", pageviews: Math.round(980 * k), contacts: Math.round(41 * k) },
+        { source: "www.google.com", pageviews: Math.round(620 * k), contacts: Math.round(22 * k) },
+        { source: "direct", pageviews: Math.round(510 * k), contacts: Math.round(18 * k) },
+        { source: "line", pageviews: Math.round(190 * k), contacts: Math.round(14 * k) },
+        { source: "google-ads", pageviews: Math.round(100 * k), contacts: Math.round(6 * k) },
+      ],
+      pages: [
+        { path: "/", views: Math.round(1150 * k), avg_secs: 74, avg_depth: 55 },
+        { path: "/grab-monthly/", views: Math.round(640 * k), avg_secs: 102, avg_depth: 63 },
+        { path: "/rent-daily/", views: Math.round(380 * k), avg_secs: 66, avg_depth: 48 },
+        { path: "/driver-income-calculator/", views: Math.round(170 * k), avg_secs: 148, avg_depth: 71 },
+        { path: "/byd-dolphin/", views: Math.round(60 * k), avg_secs: 58, avg_depth: 52 },
+      ],
+      devices: { mobile: Math.round(pageviews * 0.81), desktop: Math.round(pageviews * 0.16), tablet: Math.round(pageviews * 0.03) },
+      cars: [{ car: "08", n: Math.round(96 * k) }, { car: "01", n: Math.round(71 * k) }, { car: "09", n: Math.round(64 * k) }, { car: "02", n: Math.round(40 * k) }, { car: "05", n: Math.round(22 * k) }],
+      events: {},
+      requests_by_source: [{ source: "facebook", n: Math.round(14 * k) }, { source: "direct", n: Math.round(6 * k) }, { source: "google-ads", n: Math.round(3 * k) }],
+    };
+  }
+  const session = { user: { id: ME, email: ROLE === "owner" ? "owner@impcar.demo" : "staff@impcar.demo" }, access_token: "demo" };
+  document.addEventListener("DOMContentLoaded", () => {
+    const bar = document.createElement("div");
+    bar.style.cssText = "position:relative;z-index:50;background:#c8f135;color:#111;padding:6px 12px;font:600 13px system-ui;text-align:center";
+    bar.innerHTML = "โหมดตัวอย่าง ข้อมูลสมมติทั้งหมด กดได้ทุกปุ่ม (รีเฟรชแล้วเริ่มใหม่) ";
+    const sw = document.createElement("button");
+    sw.type = "button";
+    sw.textContent = ROLE === "owner" ? "ลองดูแบบพนักงาน" : "กลับไปดูแบบเจ้าของ";
+    sw.style.cssText = "margin-left:8px;padding:4px 12px;border-radius:8px;border:1px solid #14181f;background:#fff;font:600 13px system-ui;cursor:pointer";
+    sw.addEventListener("click", () => { window.name = ROLE === "owner" ? "imp-demo-staff" : ""; location.hash = "#dashboard"; location.reload(); });
+    bar.appendChild(sw);
+    document.body.prepend(bar);
+  });
+  window.supabase = {
+    createClient() {
+      return {
+        from: builder,
+        rpc(name, args) {
+          if (name === "my_role") return Promise.resolve({ data: ROLE, error: null });
+          if (name === "audit_recent") return Promise.resolve({ data: DB.audit, error: null });
+          if (name === "web_stats") return Promise.resolve({ data: demoStats(Number(args && args.p_days) || 30), error: null });
+          if (name === "erase_customer") { const c = cust(args.p_customer_id); Object.assign(c, { full_name: "ลบข้อมูลแล้ว #" + c.id, phone: null, line_id: null, id_card_no: null, address: null, erased_at: now() }); return Promise.resolve({ data: [], error: null }); }
+          return Promise.resolve({ data: null, error: null });
+        },
+        auth: {
+          onAuthStateChange(cb) { setTimeout(() => cb("INITIAL_SESSION", session), 0); return { data: { subscription: { unsubscribe() {} } } }; },
+          signOut() { return Promise.resolve({ error: null }); },
+          signInWithPassword() { return Promise.resolve({ data: {}, error: null }); }, updateUser() { return Promise.resolve({ data: {}, error: null }); },
+          resetPasswordForEmail() { return Promise.resolve({ error: null }); },
+        },
+        functions: { invoke(n) { return Promise.resolve({ data: { ok: true, queued: true, message: n === "invite-staff" ? "โหมดตัวอย่าง: ไม่ได้ส่งอีเมลจริง" : "โหมดตัวอย่าง: ไม่ได้สั่งอัปเดตเว็บจริง" }, error: null }); } },
+        storage: { from() { return { upload: () => Promise.resolve({ data: {}, error: null }), remove: () => Promise.resolve({ data: [], error: null }),
+          createSignedUrl: () => Promise.resolve({ data: { signedUrl: "data:text/plain;charset=utf-8,โหมดตัวอย่าง: ไม่มีไฟล์จริง" }, error: null }) }; } },
+        channel() { const c = { on() { return c; }, subscribe() { return c; } }; return c; },
+        removeChannel() {},
+      };
+    },
+  };
+})();
+</script>
+<script>
+// IMP CarRent หลังบ้าน (เดโม): lib.js + admin.js เป็นสคริปต์ธรรมดา
+(function () {
+"use strict";
+// ฟังก์ชันล้วน (ไม่แตะหน้าเว็บ/ฐานข้อมูล) ใช้ในหน้าแอดมิน และทดสอบด้วย node ได้ (tools/test_admin_lib.mjs)
+
+const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+/** escape ทุกข้อความที่มาจากผู้ใช้/ฐานข้อมูลก่อนใส่ใน HTML (คำขอจองมาจากคนทั่วไป) */
+const esc = (v) => (v === null || v === undefined ? "" : String(v)).replace(/[&<>"']/g, (c) => ESC[c]);
+
+const baht = (n) => (Number(n) || 0).toLocaleString("th-TH", { maximumFractionDigits: 0 });
+
+const TZ = "Asia/Bangkok";
+/** วันนี้ตามเวลาไทย YYYY-MM-DD */
+const bkkToday = (now = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+
+const parse = (iso) => { const [y, m, d] = iso.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const fmt = (dt) => dt.toISOString().slice(0, 10);
+const addDays = (iso, n) => { const d = parse(iso); d.setUTCDate(d.getUTCDate() + n); return fmt(d); };
+/** เพิ่มเดือนแบบ Postgres (31 ม.ค. + 1 เดือน = 28/29 ก.พ.) */
+const addMonths = (iso, n) => {
+  const d = parse(iso);
+  const day = d.getUTCDate();
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1));
+  const last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
+  t.setUTCDate(Math.min(day, last));
+  return fmt(t);
+};
+const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+
+const TH_M = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const TH_WD = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+/** '2026-11-24' -> '24 พ.ย. 69' */
+const thDate = (iso, year = true) => {
+  if (!iso) return "-";
+  const [y, m, d] = String(iso).slice(0, 10).split("-").map(Number);
+  return d + " " + TH_M[m - 1] + (year ? " " + String(y + 543).slice(2) : "");
+};
+const thDateTime = (ts) => {
+  if (!ts) return "-";
+  const d = new Date(ts);
+  const iso = bkkToday(d);
+  const hm = new Intl.DateTimeFormat("th-TH", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(d);
+  return thDate(iso) + " " + hm;
+};
+const weekday = (iso) => parse(iso).getUTCDay();
+
+/** วันคืนรถ + จำนวนหน่วย ให้ตรงกับที่ฐานข้อมูลคำนวณ */
+function bookingPeriod(kind, start, { end, months } = {}) {
+  if (!start) return { end: null, units: 0 };
+  if (kind === "monthly") {
+    const n = Math.max(1, parseInt(months, 10) || 1);
+    return { end: addDays(addMonths(start, n), -1), units: n };
+  }
+  const e = end && end >= start ? end : start;
+  return { end: e, units: daysBetween(start, e) + 1 };
+}
+const bookingTotal = (unitPrice, units, discount = 0) => Math.max(0, (Number(unitPrice) || 0) * (Number(units) || 0) - (Number(discount) || 0));
+
+const BLOCKING = ["hold", "confirmed", "active"];
+const overlaps = (a, b) => a.start_date <= b.end_date && b.start_date <= a.end_date;
+
+/** ปฏิทินรถ: แต่ละคัน -> ช่องวันละ 1 ช่อง {d, b (booking|null), first (วันแรกที่เห็นของ booking)} */
+function calendarRows(cars, bookings, from, days) {
+  const dates = Array.from({ length: days }, (_, i) => addDays(from, i));
+  return cars.map((car) => {
+    const mine = bookings.filter((b) => b.car_id === car.id && BLOCKING.includes(b.status));
+    const cells = dates.map((d) => {
+      const b = mine.find((x) => x.start_date <= d && d <= x.end_date) || null;
+      return { d, b, first: !!b && (b.start_date === d || d === from) };
+    });
+    return { car, cells };
+  });
+}
+
+const STATUS_TH = {
+  hold: "รอยืนยัน", confirmed: "ยืนยันแล้ว", active: "รถอยู่กับลูกค้า", returned: "คืนรถแล้ว", cancelled: "ยกเลิก",
+};
+const REQ_STATUS_TH = { new: "ใหม่", contacted: "ติดต่อแล้ว", converted: "จองแล้ว", rejected: "ไม่รับ", spam: "สแปม" };
+const KIND_TH = { daily: "รายวัน", monthly: "รายเดือน", maintenance: "ปิดรถ/ซ่อม" };
+const PAY_KIND_TH = {
+  reservation: "มัดจำจอง", rent: "ค่าเช่า", deposit: "เงินประกัน", deposit_refund: "คืนเงินประกัน", damage: "ค่าเสียหาย", other: "อื่นๆ",
+};
+const PAY_STATUS_TH = { due: "ค้างชำระ", paid: "ชำระแล้ว", void: "ยกเลิก" };
+const METHOD_TH = { transfer: "โอน", promptpay: "พร้อมเพย์", cash: "เงินสด", other: "อื่นๆ" };
+const DOC_KIND_TH = { id_card: "บัตรประชาชน", driver_license: "ใบขับขี่", house_reg: "ทะเบียนบ้าน", contract: "สัญญาที่เซ็นแล้ว", other: "อื่นๆ" };
+
+/** สถานะถัดไปที่กดได้ (พนักงาน) */
+const NEXT_STATUS = {
+  hold: ["confirmed", "cancelled"],
+  confirmed: ["active", "hold", "cancelled"],
+  active: ["returned"],
+  returned: [],
+  cancelled: [],
+};
+
+/** แปลง error จาก Supabase เป็นข้อความไทยที่คนอ่านเข้าใจ */
+function errMsg(e) {
+  if (!e) return "เกิดข้อผิดพลาด";
+  const code = e.code || "";
+  const msg = String(e.message || e.error_description || e.error || e);
+  if (code === "23P01" || /bookings_no_overlap/.test(msg)) return "รถคันนี้มีคิวในช่วงวันที่นี้แล้ว เลือกวันหรือรถคันอื่น";
+  if (code === "23505") return "ข้อมูลนี้มีอยู่แล้ว (ซ้ำ)";
+  if (code === "42501" && !/[ก-๙]/.test(msg)) return "บัญชีนี้ไม่มีสิทธิ์ทำรายการนี้";
+  if (/Invalid login credentials/i.test(msg)) return "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+  if (/Email not confirmed/i.test(msg)) return "ยังไม่ได้ยืนยันอีเมล เปิดลิงก์ในอีเมลก่อน";
+  if (/Failed to fetch|NetworkError|network/i.test(msg)) return "เชื่อมต่อไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่";
+  if (/JWT expired|invalid JWT/i.test(msg)) return "หมดเวลาเข้าระบบ ล็อกอินใหม่";
+  if (/[ก-๙]/.test(msg)) return msg;  // ข้อความไทยจากฐานข้อมูล (raise exception)
+  return "เกิดข้อผิดพลาด: " + msg.slice(0, 160);
+}
+
+const normPhone = (s) => String(s || "").replace(/[^0-9+]/g, "");
+const validPhone = (s) => /^(\+66|0)[0-9]{8,9}$/.test(normPhone(s));
+
+/** ข้อความสรุปการจอง ไว้คัดลอกส่งลูกค้าทาง LINE */
+function bookingSummary(b, { brand = "IMP CarRent", colorName = (x) => x } = {}) {
+  const lines = [
+    `${brand} · สรุปการจอง ${b.contract_no || ""}`.trim(),
+    `รถ: BYD Dolphin คันที่ ${b.car_no} (${colorName(b.car_color)})`,
+    `แบบ: ${KIND_TH[b.kind] || b.kind} ${b.units} ${b.kind === "monthly" ? "เดือน" : "วัน"}`,
+    `รับรถ: ${thDate(b.start_date)} · คืนรถ: ${thDate(b.end_date)}`,
+    `ค่าเช่า: ${baht(b.unit_price)} บาท/${b.kind === "monthly" ? "เดือน" : "วัน"}` + (b.discount ? ` ส่วนลด ${baht(b.discount)} บาท` : ""),
+    `รวม: ${baht(b.total_price)} บาท` + (b.paid_rent ? ` · ชำระแล้ว ${baht(b.paid_rent)} · คงเหลือ ${baht(b.outstanding)}` : ""),
+  ];
+  if (b.deposit) lines.push(`เงินประกัน: ${baht(b.deposit)} บาท (คืนในวันที่คืนรถ หากไม่มีความเสียหาย)`);
+  return lines.join("\n");
+}
+
+// IMP CarRent ระบบหลังบ้าน (Supabase) — หน้าเดียว เปลี่ยนหน้าด้วย #hash
+// สิทธิ์จริงอยู่ในฐานข้อมูล (RLS + trigger) หน้านี้แค่ซ่อนปุ่มที่ไม่มีสิทธิ์ให้ใช้ง่ายขึ้น
+
+const CFG = window.IMP_ADMIN || {};
+const app = document.getElementById("app");
+const modal = document.getElementById("modal");
+const modalBody = document.getElementById("modal-body");
+
+if (!CFG.url || !CFG.anonKey || !window.supabase) {
+  app.innerHTML = '<div class="login-wrap"><div class="login"><h1>ยังไม่ได้ตั้งค่าระบบหลังบ้าน</h1><p>ใส่ <code>backend.supabase_url</code> และ <code>backend.supabase_anon_key</code> ใน site.config.json แล้ว build ใหม่ ดูวิธีใน docs/ADMIN.md</p></div></div>';
+  throw new Error("admin not configured");
+}
+
+// ลิงก์เชิญ/ลืมรหัสผ่านจากอีเมล: ต้องตั้งรหัสผ่านใหม่หลังเข้าระบบ
+const NEEDS_PASSWORD = /type=(invite|recovery)/.test(location.hash);
+const sb = window.supabase.createClient(CFG.url, CFG.anonKey, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "implicit" },
+});
+
+const S = { session: null, me: null, settings: null, cars: [], staff: [], newRequests: 0, rebuildTimer: null };
+const COLORS = Object.fromEntries((CFG.colors || []).map((c) => [c.slug, c]));
+const colorName = (slug) => (COLORS[slug] ? COLORS[slug].name_th : slug || "-");
+const swatch = (slug) => `<span class="swatch" style="background:${esc((COLORS[slug] || {}).hex || "#ddd")}"></span>`;
+const isOwner = () => S.me && S.me.role === "owner";
+const today = () => bkkToday();
+const carById = (id) => S.cars.find((c) => c.id === id) || {};
+const carByNo = (no) => S.cars.find((c) => c.no === no) || { no };
+/** ป้ายทะเบียนรถ (ตัวเอกของหน้าจอ) บรรทัดล่างแบบป้ายจริงบอกคันที่และสี */
+const plate = (car, sm = false) => {
+  const top = car.plate || "คันที่ " + car.no;
+  const sub = car.plate ? `คันที่ ${car.no} ${colorName(car.color)}` : colorName(car.color);
+  return `<span class="plate${sm ? " sm" : ""}"><b>${esc(top)}</b><small>${esc(sub)}</small></span>`;
+};
+const SOURCE_TH = { web: "จากเว็บ", line: "จาก LINE", admin: "ลงเอง" };
+const thLong = (iso) => new Intl.DateTimeFormat("th-TH", { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(new Date(iso + "T00:00:00Z"));
+
+// ---------------------------------------------------------------- ไอคอน (เส้น 1.8)
+const I = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  dashboard: I('<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="M8 14h3"/>'),
+  requests: I('<path d="M4 13l2.5-7h11L20 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 13h4.5l1 2h5l1-2H20"/>'),
+  calendar: I('<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 13h2M14 13h2M8 17h2M14 17h2"/>'),
+  bookings: I('<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>'),
+  payments: I('<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9.5v5M18 9.5v5"/>'),
+  customers: I('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 20a6.5 6.5 0 0 0-3-5.5"/>'),
+  line: I('<path d="M12 4c5 0 9 3.1 9 7s-4 7-9 7c-.8 0-1.6-.1-2.3-.2L5 20l1-3.6C4.2 15.1 3 13.1 3 11c0-3.9 4-7 9-7z"/>'),
+  cars: I('<path d="M5 16l1.5-5.5A2 2 0 0 1 8.4 9h7.2a2 2 0 0 1 1.9 1.5L19 16"/><rect x="3" y="15" width="18" height="4" rx="1.5"/><circle cx="7" cy="19.5" r="1.2"/><circle cx="17" cy="19.5" r="1.2"/>'),
+  staff: I('<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20a6.5 6.5 0 0 1 11-4.7"/><path d="M16 19l2 2 4-4"/>'),
+  settings: I('<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'),
+  stats: I('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+  more: I('<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>'),
+  logout: I('<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/>'),
+  phone: I('<path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/>'),
+  bolt: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>',
+};
+
+// ---------------------------------------------------------------- helpers
+async function q(promise) {
+  const { data, error } = await promise;
+  if (error) throw error;
+  return data;
+}
+function toast(msg, isErr = false) {
+  const el = document.createElement("div");
+  if (isErr) el.className = "err";
+  el.textContent = msg;
+  document.getElementById("toast").appendChild(el);
+  setTimeout(() => el.remove(), isErr ? 7000 : 3500);
+}
+const fail = (e) => { console.error(e); toast(errMsg(e), true); };
+function openModal(html) {
+  modalBody.innerHTML = html;
+  if (!modal.open) modal.showModal();
+  modalBody.querySelector("[data-close]")?.addEventListener("click", closeModal);
+  return modalBody;
+}
+const closeModal = () => modal.open && modal.close();
+/** หน้าต่างยืนยันในหน้า (แทน confirm/prompt ของเบราว์เซอร์) คืนค่า true / ข้อความ / null ถ้ากดยกเลิก */
+function ask(message, { ok = "ยืนยัน", danger = false, input = null } = {}) {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = (v) => { if (!done) { done = true; resolve(v); } };
+    const body = openModal(`<h2>${esc(message)}</h2><form class="form" id="ask">
+      ${input !== null ? `<textarea name="v">${esc(input)}</textarea>` : ""}
+      <div class="row"><span class="spacer"></span><button type="button" class="btn" data-close>ยกเลิก</button>
+      <button class="btn ${danger ? "danger" : "primary"}">${esc(ok)}</button></div></form>`);
+    modal.addEventListener("close", () => finish(null), { once: true });
+    const f = body.querySelector("#ask");
+    f.addEventListener("submit", (e) => { e.preventDefault(); finish(input !== null ? f.v.value : true); closeModal(); });
+    (f.v || f.querySelector(".btn:last-child")).focus();
+  });
+}
+/** sessionStorage ที่ไม่พังในหน้าที่ถูกจำกัดสิทธิ์ (จำแค่ตัวกรองที่เลือก) */
+const store = {
+  get(k) { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { sessionStorage.setItem(k, v); } catch { /* ไม่จำก็ได้ */ } },
+};
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+const pill = (cls, text) => `<span class="pill ${esc(cls)}">${esc(text)}</span>`;
+const formData = (form) => Object.fromEntries(new FormData(form).entries());
+const go = (hash) => { if (location.hash === hash) route(); else location.hash = hash; };
+const callBtn = (phone) => (phone ? `<a class="btn small call" href="tel:${esc(phone)}">${ICON.phone}โทร</a>` : "");
+const formFoot = (label) => `<div class="row" style="margin-top:4px"><span class="spacer"></span><button type="button" class="btn" data-close>ปิด</button><button class="btn primary">${label}</button></div>`;
+async function withBusy(btn, fn) {
+  if (btn) btn.disabled = true;
+  try { return await fn(); } catch (e) { fail(e); } finally { if (btn) btn.disabled = false; }
+}
+function seg(name, options, current) {
+  return `<div class="seg" role="group" data-seg="${name}">${options.map(([v, label]) =>
+    `<button type="button" data-v="${v}" aria-pressed="${v === current}">${label}</button>`).join("")}</div>`;
+}
+function bindSeg(main, name, key) {
+  main.querySelector(`[data-seg="${name}"]`)?.addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-v]");
+    if (b) { store.set(key, b.dataset.v); route(); }
+  });
+}
+
+/** ย่อรูปจากกล้องมือถือก่อนอัปโหลด (ยาวสุด 1600px JPEG) ไฟล์อื่นอัปโหลดตามเดิม */
+async function shrinkImage(file) {
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size < 400_000) return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+    c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.82));
+    return blob ? new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" }) : file;
+  } catch { return file; }
+}
+async function upload(prefix, file) {
+  const f = await shrinkImage(file);
+  const ext = (f.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 5) || "bin";
+  const path = `${prefix}/${crypto.randomUUID()}.${ext}`;
+  await q(sb.storage.from("private-docs").upload(path, f, { contentType: f.type || "application/octet-stream", upsert: false }));
+  return path;
+}
+async function openFile(path) {
+  const w = window.open("", "_blank");
+  try {
+    const { signedUrl } = await q(sb.storage.from("private-docs").createSignedUrl(path, 60));
+    if (w) w.location = signedUrl; else location.href = signedUrl;
+  } catch (e) { if (w) w.close(); fail(e); }
+}
+
+/** สั่ง build เว็บใหม่ (สถานะรถบนหน้าเว็บ) หน่วง 20 วิ รวมหลายการแก้ไขเป็นครั้งเดียว */
+function scheduleRebuild() {
+  clearTimeout(S.rebuildTimer);
+  S.rebuildTimer = setTimeout(rebuildNow, 20_000);
+}
+async function rebuildNow(manual = false) {
+  clearTimeout(S.rebuildTimer);
+  try {
+    const { data, error } = await sb.functions.invoke("rebuild-site", { body: {} });
+    if (error) throw error;
+    if (manual || data?.queued) toast(data?.message || "สั่งอัปเดตเว็บแล้ว");
+    if (data && data.queued === false) S.rebuildTimer = setTimeout(rebuildNow, 130_000);
+  } catch (e) {
+    if (manual) fail(e); else console.warn("rebuild-site", e);
+  }
+}
+
+// ---------------------------------------------------------------- เข้าสู่ระบบ
+function renderLogin(msg = "") {
+  app.innerHTML = `
+  <div class="login-wrap"><div class="login">
+    <span class="brand"><span class="brand-mark">${ICON.bolt}</span>IMP CarRent</span>
+    <h1>เข้าระบบหลังบ้าน</h1>
+    <p>${msg ? esc(msg) : "สำหรับเจ้าของร้านและพนักงาน"}</p>
+    <form class="form" id="login">
+      <label class="f"><span>อีเมล</span><input name="email" type="email" autocomplete="username" required></label>
+      <label class="f"><span>รหัสผ่าน</span><input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn primary">เข้าสู่ระบบ</button>
+      <button class="btn" type="button" id="forgot">ลืมรหัสผ่าน</button>
+    </form>
+  </div></div>`;
+  const form = document.getElementById("login");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(form.querySelector(".primary"), async () => {
+      const v = formData(form);
+      await q(sb.auth.signInWithPassword({ email: v.email.trim(), password: v.password }));
+    });
+  });
+  document.getElementById("forgot").addEventListener("click", (e) => withBusy(e.target, async () => {
+    const email = form.email.value.trim();
+    if (!email) { toast("ใส่อีเมลก่อน แล้วกดลืมรหัสผ่านอีกครั้ง", true); return; }
+    await q(sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname }));
+    toast("ส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่อีเมลแล้ว");
+  }));
+}
+
+function askNewPassword() {
+  const body = openModal(`
+    <h2>ตั้งรหัสผ่านใหม่</h2>
+    <form class="form" id="pw">
+      <label class="f"><span>รหัสผ่านใหม่</span><input name="p1" type="password" minlength="10" autocomplete="new-password" required>อย่างน้อย 10 ตัว</label>
+      <label class="f"><span>พิมพ์ซ้ำอีกครั้ง</span><input name="p2" type="password" minlength="10" autocomplete="new-password" required></label>
+      <button class="btn primary">บันทึกรหัสผ่าน</button>
+    </form>`);
+  const form = body.querySelector("#pw");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(form.querySelector("button"), async () => {
+      const v = formData(form);
+      if (v.p1 !== v.p2) { toast("รหัสผ่านสองช่องไม่ตรงกัน", true); return; }
+      await q(sb.auth.updateUser({ password: v.p1 }));
+      closeModal();
+      toast("บันทึกรหัสผ่านแล้ว");
+    });
+  });
+}
+
+async function loadMe() {
+  const role = await q(sb.rpc("my_role"));
+  if (!role) return null;
+  const uid = S.session.user.id;
+  const [staff, settings, cars] = await Promise.all([
+    q(sb.from("staff").select("*").order("created_at")),
+    q(sb.from("settings").select("*").single()),
+    q(sb.from("cars").select("*").order("no")),
+  ]);
+  S.staff = staff; S.settings = settings; S.cars = cars;
+  const mine = staff.find((s) => s.user_id === uid);
+  return { role, name: mine ? mine.name : S.session.user.email };
+}
+
+// ---------------------------------------------------------------- โครงหน้า
+const TABS = [
+  ["dashboard", "วันนี้", 1], ["requests", "คำขอจอง", 1], ["calendar", "ปฏิทิน", 1], ["bookings", "การจอง", 1],
+  ["payments", "เงินค้าง"], ["customers", "ลูกค้า"], ["line", "แชต LINE"], ["stats", "สถิติเว็บ"], ["cars", "รถ"],
+  ["staff", "พนักงาน", 0, true], ["settings", "ตั้งค่า", 0, true],
+];
+function shell(active) {
+  const tabs = TABS.filter(([, , , owner]) => !owner || isOwner());
+  const badge = (k) => (k === "requests" && S.newRequests ? `<span class="badge">${S.newRequests}</span>` : "");
+  const link = ([k, label, primary]) => `<a href="#${k}" class="${primary ? "" : "more-only"}" ${k === active ? 'aria-current="page"' : ""}>${ICON[k]}<span>${label}</span>${badge(k)}</a>`;
+  const moreActive = tabs.some(([k, , primary]) => !primary && k === active);
+  app.innerHTML = `
+  <header class="top">
+    <a class="brand" href="#dashboard"><span class="brand-mark">${ICON.bolt}</span>IMP CarRent</a>
+    <span class="who">${esc(S.me.name)}<small>${isOwner() ? "เจ้าของ" : "พนักงาน"}</small></span>
+    <button type="button" class="icon-btn" id="logout" title="ออกจากระบบ">${ICON.logout}</button>
+  </header>
+  <nav class="tabs" aria-label="เมนู">${tabs.map(link).join("")}
+    <a href="#" class="more-btn" ${moreActive ? 'aria-current="page"' : ""} data-more>${ICON.more}<span>เพิ่มเติม</span></a></nav>
+  <div class="more-sheet" hidden>${tabs.filter(([, , primary]) => !primary).map(([k, label]) =>
+    `<a href="#${k}" ${k === active ? 'aria-current="page"' : ""}>${ICON[k]}${label}</a>`).join("")}</div>
+  <main id="main"><p class="muted">กำลังโหลด…</p></main>`;
+  document.getElementById("logout").addEventListener("click", async () => { await sb.auth.signOut(); });
+  const sheet = app.querySelector(".more-sheet");
+  app.querySelector("[data-more]").addEventListener("click", (e) => { e.preventDefault(); sheet.hidden = !sheet.hidden; });
+  sheet.addEventListener("click", () => { sheet.hidden = true; });
+  return document.getElementById("main");
+}
+async function refreshBadge() {
+  const { count } = await sb.from("booking_requests").select("id", { count: "exact", head: true }).eq("status", "new");
+  S.newRequests = count || 0;
+  document.querySelectorAll('nav.tabs a[href="#requests"]').forEach((a) => {
+    a.querySelector(".badge")?.remove();
+    if (S.newRequests) a.insertAdjacentHTML("beforeend", `<span class="badge">${S.newRequests}</span>`);
+  });
+  document.title = (S.newRequests ? `(${S.newRequests}) ` : "") + "หลังบ้าน IMP CarRent";
+}
+
+const VIEWS = {};
+async function route() {
+  if (!S.me) return;
+  const [name, id] = (location.hash.replace(/^#/, "") || "dashboard").split("/");
+  const view = VIEWS[name] || VIEWS.dashboard;
+  const active = { booking: "bookings", customer: "customers" }[name] || (VIEWS[name] ? name : "dashboard");
+  const main = shell(active);
+  try { await view(main, id); } catch (e) { fail(e); main.innerHTML = `<div class="empty">${esc(errMsg(e))}</div>`; }
+  window.scrollTo(0, 0);
+}
+
+// ---------------------------------------------------------------- วันนี้
+VIEWS.dashboard = async function dashboard(main) {
+  const t = today();
+  const [open, dues, reqs] = await Promise.all([
+    q(sb.from("v_bookings").select("*").in("status", ["hold", "confirmed", "active"]).order("start_date")),
+    q(sb.from("v_payments_due").select("*").lte("due_date", t).order("due_date")),
+    q(sb.from("booking_requests").select("*").eq("status", "new").order("created_at", { ascending: false }).limit(20)),
+  ]);
+  S.newRequests = reqs.length;
+  const late = open.filter((b) => b.status === "active" && b.end_date < t);
+  const pickups = open.filter((b) => b.start_date === t && b.status !== "active");
+  const returns = open.filter((b) => b.end_date === t && b.status === "active");
+  const cars = S.cars.filter((c) => c.active);
+  const slots = cars.map((car) => {
+    const mine = open.filter((b) => b.car_id === car.id);
+    const lateB = mine.find((b) => b.status === "active" && b.end_date < t);
+    const now = mine.find((b) => b.start_date <= t && t <= b.end_date);
+    const next = mine.filter((b) => b.start_date > t).sort((a, b) => (a.start_date < b.start_date ? -1 : 1))[0];
+    let cls = "free", state = "ว่าง", who = next ? `คิวถัดไป ${thDate(next.start_date, false)}` : "ไม่มีคิว", href = "#calendar";
+    if (lateB) { cls = "late"; state = `เลยกำหนดคืน ${daysBetween(lateB.end_date, t)} วัน`; who = lateB.customer_name || ""; href = "#booking/" + lateB.id; }
+    else if (now && now.kind === "maintenance") { cls = "maintenance"; state = "ปิดซ่อม"; who = `ถึง ${thDate(now.end_date, false)}`; href = "#booking/" + now.id; }
+    else if (now && now.status !== "active") { cls = now.status; state = now.start_date === t ? "รอส่งรถวันนี้" : STATUS_TH[now.status]; who = now.customer_name || ""; href = "#booking/" + now.id; }
+    else if (now && now.kind === "monthly") { cls = "monthly"; state = "รายเดือน"; who = `${now.customer_name || ""}`; href = "#booking/" + now.id; }
+    else if (now) { cls = "active"; state = now.end_date === t ? "คืนรถวันนี้" : `กับลูกค้า ถึง ${thDate(now.end_date, false)}`; who = now.customer_name || ""; href = "#booking/" + now.id; }
+    return { car, cls, state, who, href };
+  });
+  const free = slots.filter((s) => s.cls === "free").length;
+  const task = (kind, kindLabel, b, meta, extra = "") => `<div class="task ${kind === "late" ? "late" : ""}">
+    <span class="kind ${kind}">${kindLabel}</span>
+    <div><div class="what"><a href="#booking/${b.id}">${esc(b.customer_name || KIND_TH[b.kind])}</a></div><div class="meta">${plate(carById(b.car_id), true)} ${meta}</div></div>
+    <div class="go">${callBtn(b.customer_phone)}${extra}</div></div>`;
+  const tasks = [
+    ...late.map((b) => task("late", "เลยกำหนดคืน", b, `ต้องคืน ${thDate(b.end_date)}`)),
+    ...pickups.map((b) => task("out", "ส่งรถ", b, `${KIND_TH[b.kind]} ${b.units} ${b.kind === "monthly" ? "เดือน" : "วัน"}${b.outstanding ? `, ค้าง ${baht(b.outstanding)} บาท` : ""}`)),
+    ...returns.map((b) => task("in", "รับคืน", b, b.deposit_held ? `ถือเงินประกัน ${baht(b.deposit_held)} บาท` : "")),
+    ...dues.map((p) => `<div class="task ${p.due_date < t ? "late" : ""}"><span class="kind money">เก็บเงิน</span>
+      <div><div class="what"><a href="#booking/${p.booking_id}">${esc(p.customer_name || p.contract_no)}</a></div>
+      <div class="meta">${esc(PAY_KIND_TH[p.kind])} ${baht(p.amount)} บาท ${p.due_date < t ? `<b style="color:var(--bad)">เลยกำหนด ${thDate(p.due_date)}</b>` : "ครบกำหนดวันนี้"}</div></div>
+      <div class="go">${callBtn(p.customer_phone)}</div></div>`),
+    ...reqs.slice(0, 5).map((r) => `<div class="task"><span class="kind req">คำขอใหม่</span>
+      <div><div class="what"><a href="#requests">${esc(r.name || r.phone)}</a></div>
+      <div class="meta">${r.plan === "daily" ? `รายวัน ${r.days || 1} วัน` : `รายเดือน ${r.months || 6} เดือน`} เริ่ม ${thDate(r.start_date)}</div></div>
+      <div class="go">${callBtn(r.phone)}</div></div>`),
+  ];
+  main.innerHTML = `
+  <div class="page-head"><div><h1>วันนี้</h1><div class="sub">${esc(thLong(t))}</div></div>
+    <div class="actions"><button class="btn brand" data-new>+ จองใหม่</button></div></div>
+  <div class="today-sum">
+    <span><b>${free}</b>คันว่างจาก ${cars.length}</span><span><b>${pickups.length}</b>ส่งรถ</span><span><b>${returns.length}</b>รับคืน</span>
+    ${late.length ? `<span class="alert"><b>${late.length}</b>เลยกำหนดคืน</span>` : ""}
+    ${S.newRequests ? `<span class="alert"><b>${S.newRequests}</b>คำขอใหม่</span>` : ""}
+  </div>
+  <div class="board">${slots.map((s) => `<a class="slot ${s.cls}" href="${s.href}">${plate(s.car)}<span class="state">${esc(s.state)}</span><span class="who">${esc(s.who)}</span></a>`).join("")
+    || `<div class="empty">ยังไม่มีรถในระบบ ${isOwner() ? '<a href="#cars">เพิ่มรถ</a>' : ""}</div>`}</div>
+  <div class="board-legend"><span><i style="background:var(--volt)"></i>ว่าง</span><span><i style="background:var(--hold)"></i>รอยืนยัน</span>
+    <span><i style="background:var(--confirmed)"></i>รอส่งรถ</span><span><i style="background:var(--active)"></i>กับลูกค้า</span>
+    <span><i style="background:var(--monthly)"></i>รายเดือน</span><span><i style="background:var(--bad)"></i>เลยกำหนด</span></div>
+  <h2>ต้องทำวันนี้</h2>
+  <div class="tasks">${tasks.join("") || '<div class="empty">วันนี้ไม่มีงานค้าง</div>'}</div>`;
+  main.querySelector("[data-new]").addEventListener("click", () => bookingForm({}));
+  refreshBadge();
+};
+
+function dueTable(rows) {
+  if (!rows.length) return '<div class="empty">ไม่มียอดค้าง</div>';
+  const t = today();
+  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>ครบกำหนด</th><th>รถ</th><th>ลูกค้า</th><th>รายการ</th><th class="num">บาท</th></tr></thead><tbody>
+  ${rows.map((p) => `<tr><td class="${p.due_date && p.due_date < t ? "late" : ""}">${thDate(p.due_date)}</td>
+    <td>${plate(carByNo(p.car_no), true)}</td>
+    <td><a href="#booking/${p.booking_id}">${esc(p.customer_name || p.contract_no || "#" + p.booking_id)}</a>${p.customer_phone ? `<div class="small"><a href="tel:${esc(p.customer_phone)}">${esc(p.customer_phone)}</a></div>` : ""}</td>
+    <td>${esc(PAY_KIND_TH[p.kind])}</td><td class="num"><b>${baht(p.amount)}</b></td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+// ---------------------------------------------------------------- คำขอจอง
+VIEWS.requests = async function requests(main) {
+  const filter = store.get("reqFilter") || "open";
+  let qry = sb.from("booking_requests").select("*").order("created_at", { ascending: false }).limit(200);
+  if (filter === "open") qry = qry.in("status", ["new", "contacted"]);
+  const rows = await q(qry);
+  refreshBadge();
+  main.innerHTML = `
+  <div class="page-head"><div><h1>คำขอจองจากเว็บ</h1><div class="sub">ลูกค้ากรอกฟอร์มพร้อมเบอร์โทร ระบบเพิ่มเป็นลูกค้าให้แล้ว</div></div></div>
+  <div class="filters">${seg("rf", [["open", "ยังไม่จบ"], ["all", "ทั้งหมด"]], filter)}</div>
+  <div class="list">${rows.map((r) => `
+    <div class="item req" data-id="${r.id}">
+      <div class="row"><span class="title">${esc(r.name || "ไม่ระบุชื่อ")}</span>${pill(r.status, REQ_STATUS_TH[r.status])}
+        ${r.line_user_id ? pill("confirmed", "ทัก LINE แล้ว") : ""}<span class="spacer"></span><span class="meta">${thDateTime(r.created_at)}</span></div>
+      <div class="line">${r.plan === "daily" ? `รายวัน ${r.days || 1} วัน` : `รายเดือน ${r.months || 6} เดือน`}, เริ่ม ${thDate(r.start_date)}${r.car_no ? `, สนใจคันที่ ${r.car_no}` : ""}${r.color ? `, ${esc(colorName(r.color))}` : ""}</div>
+      <div class="meta">${esc(r.usage || "")}${r.source && r.source.utm_source ? ` จากโฆษณา ${esc(r.source.utm_source)}` : ""}${r.customer_id ? ` <a href="#customer/${r.customer_id}">ดูลูกค้า</a>` : ""}</div>
+      ${r.note ? `<p class="quote">${esc(r.note)}</p>` : ""}
+      ${r.staff_note ? `<p class="meta">โน้ตทีมงาน: ${esc(r.staff_note)}</p>` : ""}
+      ${["new", "contacted"].includes(r.status) ? `<div class="acts">
+        ${callBtn(r.phone)}<button class="btn small brand" data-act="convert">สร้างการจอง</button>
+        ${r.status === "new" ? '<button class="btn small" data-act="contacted">ติดต่อแล้ว</button>' : ""}
+        <button class="btn small" data-act="note">โน้ต</button>
+        <button class="btn small danger" data-act="rejected">ไม่รับ</button>
+        <button class="btn small danger" data-act="spam">สแปม</button></div>` : ""}
+    </div>`).join("") || '<div class="empty">ยังไม่มีคำขอจอง พอมีคนกรอกฟอร์มบนเว็บจะขึ้นที่นี่ และเด้งแจ้งเตือน</div>'}</div>`;
+  bindSeg(main, "rf", "reqFilter");
+  main.querySelector(".list").addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-act]");
+    if (!btn) return;
+    const id = Number(btn.closest("[data-id]").dataset.id);
+    const r = rows.find((x) => x.id === id);
+    const act = btn.dataset.act;
+    if (act === "convert") return bookingForm({ request: r });
+    if (act === "note") {
+      const note = await ask("โน้ตสำหรับคำขอนี้", { input: r.staff_note || "", ok: "บันทึกโน้ต" });
+      if (note === null) return;
+      return withBusy(btn, async () => { await q(sb.from("booking_requests").update({ staff_note: note }).eq("id", id)); route(); });
+    }
+    if ((act === "rejected" || act === "spam") && !(await ask(act === "spam" ? "ทำเครื่องหมายว่าเป็นสแปม?" : "ไม่รับคำขอนี้?", { danger: true, ok: act === "spam" ? "เป็นสแปม" : "ไม่รับ" }))) return;
+    withBusy(btn, async () => {
+      await q(sb.from("booking_requests").update({ status: act, handled_by: S.session.user.id, handled_at: new Date().toISOString() }).eq("id", id));
+      route();
+    });
+  });
+};
+
+// ---------------------------------------------------------------- ปฏิทินรถ
+VIEWS.calendar = async function calendar(main) {
+  const from = store.get("calFrom") || today();
+  const DAYS = 45;
+  const to = addDays(from, DAYS - 1);
+  const rows = await q(sb.from("v_bookings").select("id,car_id,kind,status,start_date,end_date,customer_name,contract_no")
+    .in("status", ["hold", "confirmed", "active"]).lte("start_date", to).gte("end_date", from));
+  const grid = calendarRows(S.cars.filter((c) => c.active), rows, from, DAYS);
+  const t = today();
+  const head = grid.length ? grid[0].cells.map((c) => {
+    const wd = weekday(c.d);
+    const mon = c.d.slice(8) === "01" || c.d === from ? `<small>${thDate(c.d, false).split(" ")[1]}</small>` : "";
+    return `<th class="${c.d === t ? "today" : ""} ${wd === 0 || wd === 6 ? "wkend" : ""}">${mon}${TH_WD[wd]}<br>${Number(c.d.slice(8))}</th>`;
+  }).join("") : "";
+  const body = grid.map(({ car, cells }) => `<tr><th class="car">${plate(car, true)}</th>${cells.map((c, i) => {
+    if (!c.b) return `<td data-car="${car.id}" data-d="${c.d}" title="${thDate(c.d)} ว่าง แตะเพื่อจอง"></td>`;
+    const cls = c.b.kind === "monthly" ? "monthly" : c.b.kind === "maintenance" ? "maintenance" : c.b.status;
+    const last = i === cells.length - 1 || c.b.end_date === c.d;
+    const label = c.first ? esc((c.b.customer_name || KIND_TH[c.b.kind]).split(" ")[0]) : "";
+    return `<td class="b ${cls}${c.first ? " s" : ""}${last ? " e" : ""}" data-b="${c.b.id}" title="${esc(c.b.customer_name || KIND_TH[c.b.kind])} ${thDate(c.b.start_date)} ถึง ${thDate(c.b.end_date)} (${esc(STATUS_TH[c.b.status])})"><span>${label}</span></td>`;
+  }).join("")}</tr>`).join("");
+  main.innerHTML = `
+  <div class="page-head"><div><h1>ปฏิทินรถ</h1><div class="sub">${thDate(from)} ถึง ${thDate(to)}</div></div>
+    <div class="actions"><button class="btn small" data-nav="-30">‹ ก่อนหน้า</button><button class="btn small" data-nav="0">วันนี้</button>
+    <button class="btn small" data-nav="30">ถัดไป ›</button><button class="btn small brand" data-new>+ จอง</button></div></div>
+  <div class="legend"><span><i style="background:var(--hold)"></i>รอยืนยัน</span><span><i style="background:var(--confirmed)"></i>ยืนยันแล้ว</span>
+    <span><i style="background:var(--active)"></i>กับลูกค้า</span><span><i style="background:var(--monthly)"></i>รายเดือน</span><span><i style="background:#a9b1bb"></i>ปิดซ่อม</span></div>
+  <div class="cal"><table><thead><tr><th class="car">รถ</th>${head}</tr></thead><tbody>${body || `<tr><td class="empty">ยังไม่มีรถ ${isOwner() ? '<a href="#cars">เพิ่มรถ</a>' : ""}</td></tr>`}</tbody></table></div>
+  <p class="hint" style="margin-top:10px">แตะช่องว่างเพื่อจองรถคันนั้นวันนั้น แตะแถบสีเพื่อดูการจอง</p>`;
+  main.addEventListener("click", (e) => {
+    const nav = e.target.closest("[data-nav]");
+    if (nav) { const n = Number(nav.dataset.nav); store.set("calFrom", n ? addDays(from, n) : today()); return route(); }
+    if (e.target.closest("[data-new]")) return bookingForm({});
+    const td = e.target.closest("td");
+    if (!td) return;
+    if (td.dataset.b) return go("#booking/" + td.dataset.b);
+    if (td.dataset.car) bookingForm({ carId: Number(td.dataset.car), start: td.dataset.d });
+  });
+};
+
+// ---------------------------------------------------------------- การจอง: รายการ
+VIEWS.bookings = async function bookings(main) {
+  const filter = store.get("bkFilter") || "open";
+  let qry = sb.from("v_bookings").select("*").order("start_date", { ascending: filter === "open" }).limit(300);
+  if (filter === "open") qry = qry.in("status", ["hold", "confirmed", "active"]);
+  const rows = await q(qry);
+  main.innerHTML = `
+  <div class="page-head"><div><h1>การจอง / สัญญา</h1><div class="sub">${rows.length} รายการ</div></div>
+    <div class="actions"><button class="btn brand" data-new>+ จองใหม่</button></div></div>
+  <div class="filters">${seg("bf", [["open", "ยังไม่จบ"], ["all", "ทั้งหมด"]], filter)}<input class="search" id="bs" placeholder="ค้นหาชื่อ เบอร์ เลขสัญญา หรือคันที่"></div>
+  ${rows.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>รถ</th><th>ลูกค้า</th><th>ช่วงเวลา</th><th>สถานะ</th><th class="num">ค้างจ่าย</th></tr></thead>
+  <tbody>${rows.map((b) => `<tr data-href="#booking/${b.id}" style="cursor:pointer" data-q="${esc([b.contract_no, b.customer_name, b.customer_phone, "คันที่ " + b.car_no, b.car_plate].join(" ").toLowerCase())}">
+    <td>${plate(carById(b.car_id), true)}</td>
+    <td><a href="#booking/${b.id}"><b>${esc(b.customer_name || KIND_TH[b.kind])}</b></a><div class="small muted">${esc(b.contract_no || "")}</div></td>
+    <td>${thDate(b.start_date)} ถึง ${thDate(b.end_date)}<div class="small muted">${KIND_TH[b.kind]} ${b.units} ${b.kind === "monthly" ? "เดือน" : "วัน"}</div></td>
+    <td>${pill(b.kind === "monthly" && b.status === "active" ? "monthly" : b.status, STATUS_TH[b.status])}</td>
+    <td class="num">${b.kind === "maintenance" ? "" : b.outstanding ? `<b style="color:var(--bad)">${baht(b.outstanding)}</b>` : "ครบแล้ว"}</td></tr>`).join("")}
+  </tbody></table></div>` : '<div class="empty">ยังไม่มีการจอง กด "+ จองใหม่" หรือแตะช่องว่างในปฏิทินรถ</div>'}`;
+  bindSeg(main, "bf", "bkFilter");
+  main.querySelector("#bs").addEventListener("input", (e) => {
+    const v = e.target.value.trim().toLowerCase();
+    main.querySelectorAll("tbody tr").forEach((tr) => { tr.hidden = v && !tr.dataset.q.includes(v); });
+  });
+  main.querySelector("tbody")?.addEventListener("click", (e) => {
+    const tr = e.target.closest("tr[data-href]");
+    if (tr && !e.target.closest("a")) go(tr.dataset.href);
+  });
+  main.querySelector("[data-new]").addEventListener("click", () => bookingForm({}));
+};
+
+// ---------------------------------------------------------------- การจอง: ฟอร์มสร้างใหม่
+async function bookingForm({ request = null, carId = null, start = null, customer = null }) {
+  const st = S.settings;
+  const kind0 = request ? request.plan : "daily";
+  const start0 = start || (request && request.start_date) || today();
+  const carFromReq = request && request.car_no ? (S.cars.find((c) => c.no === request.car_no) || {}).id : null;
+  const carOpts = S.cars.filter((c) => c.active).map((c) => `<option value="${c.id}">คันที่ ${c.no} ${esc(colorName(c.color))}${c.plate ? " (" + esc(c.plate) + ")" : ""}</option>`).join("");
+  const body = openModal(`
+  <h2>${request ? "จองให้ " + esc(request.name || request.phone) : "จองใหม่"}</h2>
+  <form class="form" id="bk">
+    <div class="two">
+      <label class="f"><span>รถ</span><select name="car_id" required>${carOpts}</select></label>
+      <label class="f"><span>แบบการเช่า</span><select name="kind"><option value="daily">รายวัน</option><option value="monthly">รายเดือน</option><option value="maintenance">ปิดรถซ่อม / ใช้เอง</option></select></label>
+    </div>
+    <div class="two">
+      <label class="f"><span>วันรับรถ</span><input name="start_date" type="date" required value="${esc(start0)}"></label>
+      <label class="f" data-for="daily"><span>วันคืนรถ</span><input name="end_date" type="date"></label>
+      <label class="f" data-for="monthly"><span>จำนวนเดือน</span><input name="months" type="number" min="1" max="60" value="${esc((request && request.months) || st.min_months)}">ขั้นต่ำ ${st.min_months} เดือน</label>
+    </div>
+    <fieldset data-for="customer">
+      <legend>ลูกค้า</legend>
+      <input id="cs" placeholder="ค้นหาลูกค้าเดิมจากชื่อหรือเบอร์โทร" autocomplete="off">
+      <div id="cs-results" class="list" style="margin-top:8px"></div>
+      <input type="hidden" name="customer_id">
+      <div class="two" style="margin-top:10px" data-newcust>
+        <label class="f"><span>ลูกค้าใหม่: ชื่อ-สกุล</span><input name="new_name" value="${esc((request && request.name) || "")}"></label>
+        <label class="f"><span>เบอร์โทร</span><input name="new_phone" inputmode="tel" value="${esc((request && request.phone) || "")}"></label>
+      </div>
+    </fieldset>
+    <div class="two" data-for="price">
+      <label class="f"><span>ราคาต่อ<span data-unit>วัน</span> (บาท)</span><input name="unit_price" type="number" min="0" ${isOwner() ? "" : "disabled"}></label>
+      <label class="f"><span>ส่วนลดรวม (บาท)</span><input name="discount" type="number" min="0" value="0" ${isOwner() ? "" : "disabled"}></label>
+    </div>
+    <div class="two" data-for="price">
+      <label class="f"><span>เงินประกัน (บาท)</span><input name="deposit" type="number" min="0" value="0">คืนในวันที่คืนรถ</label>
+      <label class="f"><span>สถานะ</span><select name="status"><option value="hold">รอยืนยัน (ยังไม่ได้มัดจำ)</option><option value="confirmed">ยืนยันแล้ว</option></select></label>
+    </div>
+    <label class="f"><span>หมายเหตุ</span><textarea name="note">${esc((request && request.note) || "")}</textarea></label>
+    ${isOwner() ? "" : '<p class="hint">ราคาเป็นราคามาตรฐาน ถ้าต้องให้ส่วนลด ให้เจ้าของแก้</p>'}
+    <div class="row"><span class="total" id="bk-total"></span><span class="spacer"></span>
+      <button type="button" class="btn" data-close>ยกเลิก</button><button class="btn primary">บันทึกการจอง</button></div>
+  </form>`);
+  const f = body.querySelector("#bk");
+  f.car_id.value = carId || carFromReq || f.car_id.value;
+  f.kind.value = kind0;
+  if (request && request.plan === "daily") f.end_date.value = addDays(start0, Math.max(1, request.days || 1) - 1);
+  const sync = () => {
+    const k = f.kind.value;
+    body.querySelector('[data-for="daily"]').hidden = k === "monthly";
+    body.querySelector('[data-for="monthly"]').hidden = k !== "monthly";
+    body.querySelector('[data-for="customer"]').hidden = k === "maintenance";
+    body.querySelectorAll('[data-for="price"]').forEach((el) => { el.hidden = k === "maintenance"; });
+    body.querySelector("[data-unit]").textContent = k === "monthly" ? "เดือน" : "วัน";
+    if (!f.unit_price.dataset.touched || !isOwner()) f.unit_price.value = k === "monthly" ? st.monthly_price : st.daily_price;
+    if (!f.end_date.value || f.end_date.value < f.start_date.value) f.end_date.value = f.start_date.value;
+    const p = bookingPeriod(k, f.start_date.value, { end: f.end_date.value, months: f.months.value });
+    body.querySelector("#bk-total").textContent = k === "maintenance"
+      ? `ปิดรถ ${p.units} วัน ถึง ${thDate(p.end)}`
+      : `${p.units} ${k === "monthly" ? "เดือน" : "วัน"} คืนรถ ${thDate(p.end)} รวม ${baht(bookingTotal(f.unit_price.value, p.units, f.discount.value))} บาท`;
+  };
+  f.unit_price.addEventListener("input", () => { f.unit_price.dataset.touched = "1"; });
+  f.addEventListener("input", sync);
+  f.kind.addEventListener("change", () => { delete f.unit_price.dataset.touched; sync(); });
+  sync();
+
+  const cs = body.querySelector("#cs"), out = body.querySelector("#cs-results"), newc = body.querySelector("[data-newcust]");
+  let timer;
+  const pick = (c) => {
+    f.customer_id.value = c.id;
+    newc.hidden = true;
+    out.innerHTML = `<div class="item row"><b>${esc(c.full_name)}</b><span class="meta">${esc(c.phone || "")}</span><span class="spacer"></span><button type="button" class="btn small" data-clear>เปลี่ยน</button></div>`;
+    out.querySelector("[data-clear]").addEventListener("click", () => { f.customer_id.value = ""; out.innerHTML = ""; newc.hidden = false; });
+  };
+  const search = async (term) => {
+    const t = term.replace(/[%,()]/g, " ").trim();
+    if (t.length < 2) { out.innerHTML = ""; return; }
+    const digits = normPhone(t);
+    const rows = await q(sb.from("customers").select("id,full_name,phone").is("erased_at", null)
+      .or(`full_name.ilike.%${t}%${digits.length >= 3 ? `,phone.ilike.%${digits}%` : ""}`).limit(8));
+    out.innerHTML = rows.map((c) => `<button type="button" class="btn small" data-c="${c.id}">${esc(c.full_name)} ${esc(c.phone || "")}</button>`).join(" ") || '<span class="hint">ไม่พบ กรอกเป็นลูกค้าใหม่ด้านล่าง</span>';
+    out.querySelectorAll("[data-c]").forEach((b) => b.addEventListener("click", () => pick(rows.find((c) => c.id === Number(b.dataset.c)))));
+  };
+  cs.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => search(cs.value).catch(fail), 250); });
+  if (customer) pick(customer);
+  else if (request && request.customer_id) {
+    const c = await q(sb.from("customers").select("id,full_name,phone").eq("id", request.customer_id).maybeSingle());
+    if (c) pick(c);
+  } else if (request && request.phone) {
+    const found = await q(sb.from("customers").select("id,full_name,phone").eq("phone", request.phone).is("erased_at", null).limit(1));
+    if (found.length) pick(found[0]);
+  }
+
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(f.querySelector(".primary"), async () => {
+      const v = formData(f);
+      const k = f.kind.value;
+      let customerId = v.customer_id ? Number(v.customer_id) : null;
+      if (k !== "maintenance" && !customerId) {
+        if (!v.new_name.trim()) { toast("เลือกลูกค้าเดิม หรือกรอกชื่อลูกค้าใหม่", true); return; }
+        if (v.new_phone && !validPhone(v.new_phone)) { toast("เบอร์โทรไม่ถูกต้อง", true); return; }
+        const phone = normPhone(v.new_phone) || null;
+        const dup = phone ? await q(sb.from("customers").select("id").eq("phone", phone).is("erased_at", null).limit(1)) : [];
+        customerId = dup.length ? dup[0].id
+          : (await q(sb.from("customers").insert({ full_name: v.new_name.trim(), phone, source: "admin" }).select("id").single())).id;
+      }
+      const p = bookingPeriod(k, v.start_date, { end: v.end_date, months: v.months });
+      const row = {
+        car_id: Number(v.car_id), kind: k, customer_id: k === "maintenance" ? null : customerId,
+        start_date: v.start_date, end_date: p.end, units: p.units, status: v.status || "hold",
+        unit_price: Number(f.unit_price.value) || 0, discount: Number(f.discount.value) || 0, deposit: Number(v.deposit) || 0,
+        note: v.note || null, request_id: request && request.id ? request.id : null,
+      };
+      const saved = await q(sb.from("bookings").insert(row).select("id").single());
+      if (request && request.id) {
+        await q(sb.from("booking_requests").update({ status: "converted", handled_by: S.session.user.id, handled_at: new Date().toISOString() }).eq("id", request.id));
+      }
+      closeModal();
+      toast("บันทึกการจองแล้ว");
+      scheduleRebuild();
+      go("#booking/" + saved.id);
+    });
+  });
+}
+
+// ---------------------------------------------------------------- การจอง: รายละเอียด
+VIEWS.booking = async function booking(main, id) {
+  const [b, pays] = await Promise.all([
+    q(sb.from("v_bookings").select("*").eq("id", id).maybeSingle()),
+    q(sb.from("payments").select("*").eq("booking_id", id).order("due_date", { nullsFirst: false }).order("id")),
+  ]);
+  if (!b) { main.innerHTML = '<div class="empty">ไม่พบการจองนี้ อาจถูกลบไปแล้ว <a href="#bookings">กลับไปรายการจอง</a></div>'; return; }
+  const customer = b.customer_id ? await q(sb.from("customers").select("*").eq("id", b.customer_id).maybeSingle()) : null;
+  const next = isOwner() ? ["hold", "confirmed", "active", "returned", "cancelled"].filter((s) => s !== b.status) : NEXT_STATUS[b.status];
+  const ACT_TH = { confirmed: "ยืนยันการจอง", active: "ส่งรถให้ลูกค้า", returned: "รับรถคืน", cancelled: "ยกเลิกการจอง", hold: "กลับเป็นรอยืนยัน" };
+  const unit = b.kind === "monthly" ? "เดือน" : "วัน";
+  main.innerHTML = `
+  <a class="back no-print" href="#bookings">‹ การจองทั้งหมด</a>
+  <div class="page-head"><div><h1>${esc(customer ? customer.full_name : KIND_TH[b.kind])}</h1>
+    <div class="sub">${esc(b.contract_no || "")} ${pill(b.kind === "monthly" && b.status === "active" ? "monthly" : b.status, STATUS_TH[b.status])}</div></div>
+    <div class="actions no-print">${customer ? callBtn(customer.phone) : ""}${b.kind !== "maintenance" ? '<button class="btn small" data-copy>คัดลอกสรุปส่ง LINE</button>' : ""}</div></div>
+  <div class="card">
+    <div class="row" style="gap:14px;margin-bottom:14px">${plate(carById(b.car_id))}<div><b>${KIND_TH[b.kind]} ${b.units} ${unit}</b><div class="meta">${thDate(b.start_date)} ถึง ${thDate(b.end_date)}</div></div></div>
+    <dl class="kv">
+      <dt>รับรถ</dt><dd>${thDate(b.start_date)}${b.pickup_at ? `<div class="meta">ส่งจริง ${thDateTime(b.pickup_at)}${b.pickup_km ? `, ${baht(b.pickup_km)} กม.` : ""}${b.pickup_battery != null ? `, แบต ${b.pickup_battery}%` : ""}</div>` : ""}</dd>
+      <dt>คืนรถ</dt><dd>${thDate(b.end_date)}${b.return_at ? `<div class="meta">คืนจริง ${thDateTime(b.return_at)}${b.return_km ? `, ${baht(b.return_km)} กม.` : ""}${b.return_battery != null ? `, แบต ${b.return_battery}%` : ""}</div>` : ""}</dd>
+      ${customer ? `<dt>ลูกค้า</dt><dd><a href="#customer/${customer.id}">${esc(customer.full_name)}</a>${customer.phone ? `<div class="meta">${esc(customer.phone)}</div>` : ""}</dd>` : ""}
+      ${b.kind !== "maintenance" ? `<dt>ค่าเช่า</dt><dd>${baht(b.unit_price)} × ${b.units} ${unit}${b.discount ? ` ลด ${baht(b.discount)}` : ""} = <b>${baht(b.total_price)}</b> บาท</dd>` : ""}
+      ${b.damage_note ? `<dt>ความเสียหาย</dt><dd>${esc(b.damage_note)}</dd>` : ""}
+      ${b.note ? `<dt>หมายเหตุ</dt><dd>${esc(b.note)}</dd>` : ""}
+    </dl>
+    ${b.kind !== "maintenance" ? `<div class="money-strip">
+      <div><span>ค่าเช่ารวม</span><b>${baht(b.total_price)}</b></div>
+      <div class="ok"><span>จ่ายแล้ว</span><b>${baht(b.paid_rent)}</b></div>
+      <div class="${b.outstanding ? "owe" : "ok"}"><span>ค้างจ่าย</span><b>${baht(b.outstanding)}</b></div>
+      <div><span>ถือเงินประกัน</span><b>${baht(b.deposit_held)}</b><span>จากที่ตกลง ${baht(b.deposit)}</span></div></div>` : ""}
+  </div>
+  <div class="row no-print" style="margin-top:14px">
+    ${next.map((s) => `<button class="btn ${s === "cancelled" ? "danger" : ["confirmed", "active", "returned"].includes(s) ? "primary" : ""}" data-status="${s}">${ACT_TH[s]}</button>`).join("")}
+    <span class="spacer"></span><button class="btn" data-edit>แก้ไข</button>${isOwner() ? '<button class="btn danger" data-del>ลบ</button>' : ""}
+  </div>
+  ${b.kind !== "maintenance" ? `
+  <h2>การชำระเงิน</h2>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>รายการ</th><th>ครบกำหนด</th><th>สถานะ</th><th class="num">บาท</th><th class="no-print"></th></tr></thead><tbody>
+  ${pays.map((p) => `<tr data-p="${p.id}"><td><b>${esc(PAY_KIND_TH[p.kind])}</b>${p.note ? `<div class="small muted">${esc(p.note)}</div>` : ""}</td>
+    <td class="${p.status === "due" && p.due_date && p.due_date < today() ? "late" : ""}">${thDate(p.due_date)}</td>
+    <td>${pill(p.status, PAY_STATUS_TH[p.status])}${p.paid_at ? `<div class="small muted">${thDateTime(p.paid_at)} ${esc(METHOD_TH[p.method] || "")}</div>` : ""}</td>
+    <td class="num"><b>${p.kind === "deposit_refund" ? "−" : ""}${baht(p.amount)}</b></td>
+    <td class="no-print"><div class="row" style="justify-content:flex-end">${p.status === "due" ? '<button class="btn small brand" data-pay>รับเงิน</button>' : ""}
+      ${p.slip_path ? '<button class="btn small" data-slip>สลิป</button>' : ""}
+      ${isOwner() && p.status !== "void" ? '<button class="btn small danger" data-void>ยกเลิก</button>' : ""}</div></td></tr>`).join("")
+    || '<tr><td colspan="5" class="muted">ยังไม่มีรายการ พอกด "ยืนยันการจอง" ระบบจะสร้างงวดค่าเช่าให้</td></tr>'}
+  </tbody></table></div>
+  <div class="row no-print" style="margin-top:10px"><button class="btn" data-addpay>+ บันทึกรับ/จ่ายเงิน</button></div>` : ""}`;
+
+  const reload = () => route();
+  main.addEventListener("click", async (e) => {
+    const t = e.target.closest("button");
+    if (!t) return;
+    if (t.dataset.copy !== undefined) {
+      navigator.clipboard.writeText(bookingSummary(b, { colorName })).then(() => toast("คัดลอกแล้ว วางในแชต LINE ได้เลย"), fail);
+    } else if (t.dataset.status) {
+      statusDialog(b, t.dataset.status, reload);
+    } else if (t.dataset.edit !== undefined) {
+      editBookingDialog(b, reload);
+    } else if (t.dataset.del !== undefined) {
+      if (!(await ask("ลบการจองนี้ถาวร? ถ้าลูกค้าแค่ไม่เช่าแล้ว ให้กดยกเลิกการจองแทน", { danger: true, ok: "ลบถาวร" }))) return;
+      withBusy(t, async () => { await q(sb.from("bookings").delete().eq("id", b.id)); scheduleRebuild(); go("#bookings"); });
+    } else if (t.dataset.addpay !== undefined) {
+      payDialog(b, null, reload);
+    } else {
+      const pid = Number(t.closest("[data-p]")?.dataset.p);
+      const p = pays.find((x) => x.id === pid);
+      if (!p) return;
+      if (t.dataset.pay !== undefined) payDialog(b, p, reload);
+      if (t.dataset.slip !== undefined) openFile(p.slip_path);
+      if (t.dataset.void !== undefined && await ask("ยกเลิกรายการเงินนี้?", { danger: true, ok: "ยกเลิกรายการ" })) {
+        withBusy(t, async () => { await q(sb.from("payments").update({ status: "void" }).eq("id", p.id)); reload(); });
+      }
+    }
+  });
+};
+
+function statusDialog(b, status, done) {
+  const extra = status === "active"
+    ? `<div class="two"><label class="f"><span>เลขไมล์ตอนส่ง (กม.)</span><input name="pickup_km" type="number" min="0" inputmode="numeric"></label>
+       <label class="f"><span>แบตตอนส่ง (%)</span><input name="pickup_battery" type="number" min="0" max="100" inputmode="numeric"></label></div>`
+    : status === "returned"
+      ? `<div class="two"><label class="f"><span>เลขไมล์ตอนคืน (กม.)</span><input name="return_km" type="number" min="0" inputmode="numeric"></label>
+         <label class="f"><span>แบตตอนคืน (%)</span><input name="return_battery" type="number" min="0" max="100" inputmode="numeric"></label></div>
+         <label class="f"><span>ความเสียหาย</span><textarea name="damage_note" placeholder="ถ้ามี ระบุและถ่ายรูปเก็บไว้"></textarea></label>
+         <p class="hint">คืนเงินประกันในวันที่คืนรถ ถ้ามีความเสียหาย บันทึก "ค่าเสียหาย" แล้วคืนส่วนที่เหลือ</p>`
+      : status === "cancelled" ? '<label class="f"><span>เหตุผลที่ยกเลิก</span><textarea name="note"></textarea></label>' : "";
+  const title = { confirmed: "ยืนยันการจอง", active: "ส่งรถให้ลูกค้า", returned: "รับรถคืน", cancelled: "ยกเลิกการจอง", hold: "กลับเป็นรอยืนยัน" }[status];
+  const body = openModal(`<h2>${title}</h2><form class="form" id="st">${extra}
+    ${status === "confirmed" ? `<p class="hint">ระบบจะสร้างงวดค่าเช่าที่ต้องเก็บ${b.deposit ? " และเงินประกัน" : ""}ให้ โดยหักมัดจำจองที่รับแล้ว</p>` : ""}
+    ${formFoot(title)}</form>`);
+  const f = body.querySelector("#st");
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(f.querySelector(".primary"), async () => {
+      const v = formData(f);
+      const patch = { status };
+      for (const k of ["pickup_km", "pickup_battery", "return_km", "return_battery"]) if (v[k]) patch[k] = Number(v[k]);
+      if (v.damage_note) patch.damage_note = v.damage_note;
+      if (v.note) patch.note = [b.note, "ยกเลิก: " + v.note].filter(Boolean).join("\n");
+      await q(sb.from("bookings").update(patch).eq("id", b.id));
+      closeModal(); toast(title + "แล้ว"); scheduleRebuild(); done();
+    });
+  });
+}
+
+function editBookingDialog(b, done) {
+  const body = openModal(`<h2>แก้ไขการจอง</h2><form class="form" id="eb">
+    <div class="two"><label class="f"><span>วันรับรถ</span><input name="start_date" type="date" value="${esc(b.start_date)}" required></label>
+      ${b.kind === "monthly"
+        ? `<label class="f"><span>จำนวนเดือน</span><input name="units" type="number" min="1" value="${b.units}"></label>`
+        : `<label class="f"><span>วันคืนรถ</span><input name="end_date" type="date" value="${esc(b.end_date)}"></label>`}</div>
+    ${b.kind !== "maintenance" ? `<div class="two"><label class="f"><span>ราคาต่อหน่วย</span><input name="unit_price" type="number" min="0" value="${b.unit_price}" ${isOwner() ? "" : "disabled"}></label>
+      <label class="f"><span>ส่วนลดรวม</span><input name="discount" type="number" min="0" value="${b.discount}" ${isOwner() ? "" : "disabled"}></label></div>
+      <label class="f"><span>เงินประกัน</span><input name="deposit" type="number" min="0" value="${b.deposit}"></label>` : ""}
+    <label class="f"><span>หมายเหตุ</span><textarea name="note">${esc(b.note || "")}</textarea></label>
+    <p class="hint">ต่อสัญญารายเดือนหลังยืนยันแล้ว ให้เพิ่มงวดเองที่ "บันทึกรับ/จ่ายเงิน"</p>
+    ${formFoot("บันทึก")}</form>`);
+  const f = body.querySelector("#eb");
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(f.querySelector(".primary"), async () => {
+      const v = formData(f);
+      const patch = { start_date: v.start_date, note: v.note || null };
+      if (b.kind === "monthly") patch.units = Number(v.units) || b.units;
+      else patch.end_date = v.end_date && v.end_date >= v.start_date ? v.end_date : v.start_date;
+      if (b.kind !== "maintenance") {
+        patch.deposit = Number(v.deposit) || 0;
+        if (isOwner()) { patch.unit_price = Number(v.unit_price) || 0; patch.discount = Number(v.discount) || 0; }
+      }
+      await q(sb.from("bookings").update(patch).eq("id", b.id));
+      closeModal(); toast("บันทึกแล้ว"); scheduleRebuild(); done();
+    });
+  });
+}
+
+function payDialog(b, due, done) {
+  const kinds = due ? [due.kind] : ["reservation", "rent", "deposit", "deposit_refund", "damage", "other"];
+  const body = openModal(`<h2>${due ? "รับเงิน " + esc(PAY_KIND_TH[due.kind]) + " " + baht(due.amount) + " บาท" : "บันทึกรับ/จ่ายเงิน"}</h2><form class="form" id="py">
+    <div class="two">
+      <label class="f"><span>รายการ</span><select name="kind" ${due ? "disabled" : ""}>${kinds.map((k) => `<option value="${k}">${PAY_KIND_TH[k]}</option>`).join("")}</select></label>
+      <label class="f"><span>จำนวนเงิน (บาท)</span><input name="amount" type="number" min="1" inputmode="numeric" required value="${due ? due.amount : ""}" ${due ? "disabled" : ""}></label>
+    </div>
+    <div class="two">
+      <label class="f"><span>วิธีจ่าย</span><select name="method">${Object.entries(METHOD_TH).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
+      <label class="f"><span>สลิป</span><input name="slip" type="file" accept="image/*,application/pdf">ถ่ายรูปหรือเลือกไฟล์</label>
+    </div>
+    <label class="f"><span>หมายเหตุ</span><input name="note" value="${esc(due ? due.note || "" : "")}"></label>
+    ${due ? "" : '<p class="hint">"คืนเงินประกัน" คือเงินที่ร้านจ่ายคืนลูกค้า ใส่จำนวนเป็นบวก</p>'}
+    ${formFoot(due ? "รับเงินแล้ว" : "บันทึก")}</form>`);
+  const f = body.querySelector("#py");
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(f.querySelector(".primary"), async () => {
+      const file = f.slip.files[0];
+      const slip = file ? await upload(`slips/${b.id}`, file) : null;
+      const common = { method: f.method.value, note: f.note.value || null, slip_path: slip };
+      if (due) await q(sb.from("payments").update({ ...common, status: "paid", slip_path: slip || due.slip_path }).eq("id", due.id));
+      else await q(sb.from("payments").insert({ ...common, booking_id: b.id, kind: f.kind.value, amount: Number(f.amount.value), status: "paid" }));
+      closeModal(); toast("บันทึกเงินแล้ว"); done();
+    });
+  });
+}
+
+// ---------------------------------------------------------------- เงินค้าง
+VIEWS.payments = async function payments(main) {
+  const rows = await q(sb.from("v_payments_due").select("*").order("due_date").limit(500));
+  const t = today();
+  const late = rows.filter((p) => p.due_date && p.due_date < t);
+  const soon = rows.filter((p) => p.due_date && p.due_date >= t && p.due_date <= addDays(t, 7));
+  const sum = (xs) => baht(xs.reduce((s, p) => s + p.amount, 0));
+  main.innerHTML = `<div class="page-head"><div><h1>เงินที่ต้องเก็บ</h1><div class="sub">งวดค่าเช่าและเงินประกันที่ยังไม่ได้รับ</div></div></div>
+    <div class="money-strip" style="margin:0 0 18px"><div class="owe"><span>เลยกำหนด ${late.length} รายการ</span><b>${sum(late)}</b></div>
+      <div><span>ครบใน 7 วัน ${soon.length} รายการ</span><b>${sum(soon)}</b></div><div><span>ค้างทั้งหมด ${rows.length} รายการ</span><b>${sum(rows)}</b></div></div>
+    ${dueTable(rows)}`;
+};
+
+// ---------------------------------------------------------------- ลูกค้า
+VIEWS.customers = async function customers(main) {
+  const src = store.get("custSrc") || "all";
+  let qry = sb.from("customers").select("id,full_name,phone,line_id,line_user_id,source,license_type,license_expiry,erased_at,created_at").order("created_at", { ascending: false }).limit(500);
+  if (src !== "all") qry = qry.eq("source", src);
+  const rows = await q(qry);
+  main.innerHTML = `<div class="page-head"><div><h1>ลูกค้า</h1><div class="sub">ลูกค้าจากฟอร์มเว็บและแชต LINE เข้ามาเอง</div></div>
+    <div class="actions"><button class="btn brand" data-new>+ ลูกค้าใหม่</button></div></div>
+    <div class="filters">${seg("cs", [["all", "ทั้งหมด"], ["web", "จากเว็บ"], ["line", "จาก LINE"], ["admin", "ลงเอง"]], src)}<input class="search" id="cq" placeholder="ค้นหาชื่อ เบอร์ หรือ LINE"></div>
+    <div class="list">${rows.map((c) => `<a class="item" href="#customer/${c.id}" data-q="${esc([c.full_name, c.phone, c.line_id].join(" ").toLowerCase())}">
+      <div class="row"><span class="title">${esc(c.full_name)}</span>
+        ${c.erased_at ? pill("void", "ลบข้อมูลแล้ว") : ""}${pill(c.source === "line" ? "active" : c.source === "web" ? "confirmed" : "", SOURCE_TH[c.source] || "ลงเอง")}
+        ${c.line_user_id ? pill("active", "เชื่อม LINE") : ""}${c.license_type === "public" ? pill("", "ใบขับขี่สาธารณะ") : ""}
+        ${c.license_expiry && c.license_expiry < today() ? pill("due", "ใบขับขี่หมดอายุ") : ""}</div>
+      <div class="meta">${esc(c.phone || "ไม่มีเบอร์")}${c.line_id ? `, LINE ${esc(c.line_id)}` : ""}, เพิ่มเมื่อ ${thDate(c.created_at)}</div></a>`).join("")
+      || '<div class="empty">ยังไม่มีลูกค้า</div>'}</div>`;
+  bindSeg(main, "cs", "custSrc");
+  main.querySelector("#cq").addEventListener("input", (e) => {
+    const v = e.target.value.trim().toLowerCase();
+    main.querySelectorAll("[data-q]").forEach((el) => { el.hidden = v && !el.dataset.q.includes(v); });
+  });
+  main.querySelector("[data-new]").addEventListener("click", () => customerDialog(null, (id) => go("#customer/" + id)));
+};
+
+function customerDialog(c, done) {
+  const v = c || {};
+  const body = openModal(`<h2>${c ? "แก้ไขข้อมูลลูกค้า" : "ลูกค้าใหม่"}</h2><form class="form" id="cu">
+    <label class="f"><span>ชื่อ-สกุล ตามบัตรประชาชน</span><input name="full_name" required value="${esc(v.full_name || "")}"></label>
+    <div class="two"><label class="f"><span>เบอร์โทร</span><input name="phone" inputmode="tel" value="${esc(v.phone || "")}"></label>
+      <label class="f"><span>LINE ID</span><input name="line_id" value="${esc(v.line_id || "")}"></label></div>
+    <div class="two"><label class="f"><span>เลขบัตรประชาชน</span><input name="id_card_no" inputmode="numeric" maxlength="17" value="${esc(v.id_card_no || "")}"></label>
+      <label class="f"><span>เลขใบขับขี่</span><input name="license_no" value="${esc(v.license_no || "")}"></label></div>
+    <div class="two"><label class="f"><span>ประเภทใบขับขี่</span><select name="license_type"><option value="">ไม่ระบุ</option><option value="private">ส่วนบุคคล</option><option value="public">สาธารณะ (ขับแอปได้)</option></select></label>
+      <label class="f"><span>ใบขับขี่หมดอายุ</span><input name="license_expiry" type="date" value="${esc(v.license_expiry || "")}"></label></div>
+    <label class="f"><span>ที่อยู่</span><textarea name="address">${esc(v.address || "")}</textarea></label>
+    <label class="f"><span>หมายเหตุ</span><textarea name="note">${esc(v.note || "")}</textarea></label>
+    <p class="hint">เก็บเท่าที่ต้องใช้ทำสัญญาเช่า เห็นได้เฉพาะเจ้าของและพนักงาน</p>
+    ${formFoot("บันทึก")}</form>`);
+  const f = body.querySelector("#cu");
+  f.license_type.value = v.license_type || "";
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(f.querySelector(".primary"), async () => {
+      const d = formData(f);
+      if (d.phone && !validPhone(d.phone)) { toast("เบอร์โทรไม่ถูกต้อง", true); return; }
+      const phone = normPhone(d.phone) || null;
+      if (!c && phone) {
+        const dup = await q(sb.from("customers").select("id,full_name").eq("phone", phone).is("erased_at", null).limit(1));
+        if (dup.length) { closeModal(); toast(`เบอร์นี้เป็นของ ${dup[0].full_name} อยู่แล้ว เปิดข้อมูลเดิมให้`); done(dup[0].id); return; }
+      }
+      const row = {
+        full_name: d.full_name.trim(), phone, line_id: d.line_id || null,
+        id_card_no: d.id_card_no.replace(/\D/g, "") || null, license_no: d.license_no || null,
+        license_type: d.license_type || null, license_expiry: d.license_expiry || null, address: d.address || null, note: d.note || null,
+      };
+      const saved = c
+        ? await q(sb.from("customers").update(row).eq("id", c.id).select("id").single())
+        : await q(sb.from("customers").insert({ ...row, source: "admin" }).select("id").single());
+      closeModal(); toast("บันทึกแล้ว"); done(saved.id);
+    });
+  });
+}
+
+VIEWS.customer = async function customer(main, id) {
+  const [c, docs, bks, lines] = await Promise.all([
+    q(sb.from("customers").select("*").eq("id", id).maybeSingle()),
+    q(sb.from("customer_documents").select("*").eq("customer_id", id).order("created_at", { ascending: false })),
+    q(sb.from("v_bookings").select("*").eq("customer_id", id).order("start_date", { ascending: false })),
+    q(sb.from("line_contacts").select("*").eq("customer_id", id).limit(3)),
+  ]);
+  if (!c) { main.innerHTML = '<div class="empty">ไม่พบลูกค้านี้ <a href="#customers">กลับไปรายชื่อลูกค้า</a></div>'; return; }
+  const ln = lines[0];
+  main.innerHTML = `<a class="back" href="#customers">‹ ลูกค้าทั้งหมด</a>
+    <div class="page-head"><div><h1>${esc(c.full_name)}</h1><div class="sub">${esc(SOURCE_TH[c.source] || "")}${c.erased_at ? " " + pill("void", "ลบข้อมูลแล้ว") : ""}</div></div>
+      <div class="actions">${callBtn(c.phone)}${c.erased_at ? "" : '<button class="btn" data-edit>แก้ไข</button><button class="btn brand" data-book>+ จองให้ลูกค้านี้</button>'}</div></div>
+    <div class="card"><dl class="kv">
+      <dt>เบอร์โทร</dt><dd>${esc(c.phone || "-")}</dd>
+      <dt>LINE</dt><dd>${ln ? `${ln.picture_url ? `<img src="${esc(ln.picture_url)}" alt="" width="24" height="24" style="border-radius:50%;vertical-align:-6px;margin-right:6px">` : ""}${esc(ln.display_name || "")} <a href="#line">ดูแชต</a>` : esc(c.line_id || "-")}</dd>
+      <dt>บัตรประชาชน</dt><dd>${esc(c.id_card_no || "-")}</dd>
+      <dt>ใบขับขี่</dt><dd>${esc(c.license_no || "-")} ${c.license_type ? `(${c.license_type === "public" ? "สาธารณะ" : "ส่วนบุคคล"})` : ""}
+        ${c.license_expiry ? `หมดอายุ ${thDate(c.license_expiry)}` : ""} ${c.license_expiry && c.license_expiry < today() ? pill("due", "หมดอายุแล้ว") : ""}</dd>
+      <dt>ที่อยู่</dt><dd>${esc(c.address || "-")}</dd>
+      ${c.note ? `<dt>หมายเหตุ</dt><dd>${esc(c.note)}</dd>` : ""}
+    </dl></div>
+    <h2>เอกสาร</h2>
+    ${c.erased_at ? "" : `<form class="card row" id="up"><select name="kind" style="width:auto">${Object.entries(DOC_KIND_TH).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
+      <input name="file" type="file" accept="image/*,application/pdf" required style="flex:1;min-width:180px"><button class="btn primary">อัปโหลด</button></form>`}
+    <div class="list" style="margin-top:8px">${docs.map((d) => `<div class="item row" data-doc="${d.id}"><b>${esc(DOC_KIND_TH[d.kind])}</b>
+      <span class="meta">${thDateTime(d.created_at)}</span><span class="spacer"></span>
+      <button class="btn small" data-open>เปิดดู</button>${isOwner() ? '<button class="btn small danger" data-deldoc>ลบ</button>' : ""}</div>`).join("") || '<div class="empty">ยังไม่มีเอกสาร ถ่ายรูปบัตรประชาชนและใบขับขี่ตอนทำสัญญา</div>'}</div>
+    <p class="hint" style="margin-top:8px">ไฟล์เปิดดูได้ครั้งละ 60 วินาที ระบบเตือนให้ลบหลังสัญญาสุดท้ายจบ ${S.settings.doc_retention_days} วัน</p>
+    <h2>ประวัติการเช่า</h2>
+    <div class="list">${bks.map((b) => `<a class="item" href="#booking/${b.id}"><div class="row">${plate(carById(b.car_id), true)}<span class="title">${KIND_TH[b.kind]} ${b.units} ${b.kind === "monthly" ? "เดือน" : "วัน"}</span>${pill(b.status, STATUS_TH[b.status])}</div>
+      <div class="meta">${thDate(b.start_date)} ถึง ${thDate(b.end_date)}${b.outstanding ? `, ค้าง ${baht(b.outstanding)} บาท` : ""}</div></a>`).join("") || '<div class="empty">ยังไม่เคยเช่า</div>'}</div>
+    ${isOwner() && !c.erased_at ? '<div class="row" style="margin-top:28px"><button class="btn danger" data-erase>ลบข้อมูลส่วนบุคคลตามคำขอลูกค้า (PDPA)</button></div>' : ""}`;
+  main.querySelector("[data-edit]")?.addEventListener("click", () => customerDialog(c, () => route()));
+  main.querySelector("[data-book]")?.addEventListener("click", () => bookingForm({ customer: c }));
+  const up = main.querySelector("#up");
+  up?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(up.querySelector("button"), async () => {
+      const path = await upload(`customers/${c.id}`, up.file.files[0]);
+      await q(sb.from("customer_documents").insert({ customer_id: c.id, kind: up.kind.value, storage_path: path }));
+      toast("อัปโหลดแล้ว"); route();
+    });
+  });
+  main.addEventListener("click", async (e) => {
+    const row = e.target.closest("[data-doc]");
+    if (!row) return;
+    const d = docs.find((x) => x.id === Number(row.dataset.doc));
+    if (e.target.closest("[data-open]")) openFile(d.storage_path);
+    if (e.target.closest("[data-deldoc]") && await ask("ลบเอกสารนี้ถาวร?", { danger: true, ok: "ลบถาวร" })) withBusy(e.target, async () => { await deleteDocs([d]); route(); });
+  });
+  main.querySelector("[data-erase]")?.addEventListener("click", async (e) => {
+    if (!(await ask(`ลบข้อมูลส่วนบุคคลของ "${c.full_name}" และไฟล์เอกสารทั้งหมดถาวร? ประวัติการเช่าและยอดเงินยังอยู่แบบไม่มีชื่อ`, { danger: true, ok: "ลบข้อมูล" }))) return;
+    withBusy(e.target, async () => {
+      await q(sb.rpc("erase_customer", { p_customer_id: c.id }));
+      await deleteDocs(docs);
+      toast("ลบข้อมูลแล้ว"); route();
+    });
+  });
+};
+
+async function deleteDocs(docs) {
+  if (!docs.length) return;
+  await q(sb.storage.from("private-docs").remove(docs.map((d) => d.storage_path)));
+  await q(sb.from("customer_documents").delete().in("id", docs.map((d) => d.id)));
+}
+
+// ---------------------------------------------------------------- แชต LINE
+VIEWS.line = async function line(main) {
+  const rows = await q(sb.from("line_contacts").select("*").order("last_event_at", { ascending: false }).limit(300));
+  const custIds = [...new Set(rows.map((r) => r.customer_id).filter(Boolean))];
+  const custs = custIds.length ? await q(sb.from("customers").select("id,full_name,phone").in("id", custIds)) : [];
+  const cname = (id) => (custs.find((c) => c.id === id) || {}).full_name;
+  main.innerHTML = `<div class="page-head"><div><h1>แชต LINE</h1><div class="sub">คนที่เพิ่มเพื่อนหรือทักแชต LINE OA ของร้าน ตอบแชตได้ที่แอป LINE OA เหมือนเดิม</div></div>
+    <div class="actions"><a class="btn" href="https://chat.line.biz/" target="_blank" rel="noopener">${ICON.line}เปิด LINE OA</a></div></div>
+    <div class="list">${rows.map((r) => `<div class="item" data-u="${esc(r.user_id)}"><div class="row">
+      ${r.picture_url ? `<img src="${esc(r.picture_url)}" alt="" width="40" height="40" style="border-radius:50%">` : `<span class="brand-mark" style="width:40px;height:40px;border-radius:50%">${ICON.line}</span>`}
+      <div><span class="title">${esc(r.display_name || "ผู้ใช้ LINE")}</span>
+        <div class="meta">${r.followed ? "เป็นเพื่อนอยู่" : "บล็อก/เลิกติดตามแล้ว"}, ล่าสุด ${thDateTime(r.last_event_at)}</div></div>
+      <span class="spacer"></span>${r.ref ? pill("confirmed", r.ref) : ""}${r.customer_id ? `<a class="btn small" href="#customer/${r.customer_id}">${esc(cname(r.customer_id) || "ดูลูกค้า")}</a>` : '<button class="btn small brand" data-mk>สร้างเป็นลูกค้า</button>'}</div>
+      ${r.last_message ? `<p class="quote">${esc(r.last_message)}</p>` : ""}</div>`).join("")
+      || `<div class="empty">ยังไม่มีข้อมูลจาก LINE<br>ต้องเปิด Webhook ของ LINE OA ก่อน ดูวิธีใน docs/ADMIN.md</div>`}</div>`;
+  main.querySelector(".list").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-mk]");
+    if (!btn) return;
+    const r = rows.find((x) => x.user_id === btn.closest("[data-u]").dataset.u);
+    withBusy(btn, async () => {
+      const c = await q(sb.from("customers").insert({ full_name: r.display_name || "ลูกค้า LINE", source: "line", line_user_id: r.user_id }).select("id").single());
+      await q(sb.from("line_contacts").update({ customer_id: c.id }).eq("user_id", r.user_id));
+      go("#customer/" + c.id);
+    });
+  });
+};
+
+// ---------------------------------------------------------------- สถิติเว็บ
+const SOURCE_NAME = { direct: "เข้าเว็บตรง / ไม่ทราบที่มา", facebook: "Facebook", "google-ads": "Google Ads", google: "Google", line: "LINE",
+  "www.google.com": "Google ค้นหา", "m.facebook.com": "Facebook", "l.facebook.com": "Facebook", "lm.facebook.com": "Facebook", "www.facebook.com": "Facebook" };
+const PAGE_NAME = { "/": "หน้าแรก", "/rent-daily/": "เช่ารายวัน", "/grab-monthly/": "เช่ารายเดือน ขับแอป", "/driver-income-calculator/": "คำนวณรายได้",
+  "/byd-dolphin/": "BYD Dolphin", "/privacy/": "นโยบายความเป็นส่วนตัว" };
+const nf = (n) => (Number(n) || 0).toLocaleString("th-TH");
+const pct = (a, b) => (b ? Math.round((a * 100) / b) : 0);
+/** แถวแท่งแนวนอน (ขนาด): ป้าย, แท่งสีเดียว, ตัวเลข */
+function hbars(rows, { max = Math.max(1, ...rows.map((r) => r.v)), unit = "" } = {}) {
+  return `<div class="hbars">${rows.map((r) => `<div class="hbar" data-tip="${esc(r.tip || `${r.label}: ${nf(r.v)} ${unit}`)}">
+    <span class="hbar__label">${r.labelHtml || esc(r.label)}</span>
+    <span class="hbar__track"><i style="width:${Math.max(r.v ? 1.5 : 0, (r.v * 100) / max)}%"></i></span>
+    <span class="hbar__val">${nf(r.v)}${r.extra ? ` <small>${esc(r.extra)}</small>` : ""}</span></div>`).join("")}</div>`;
+}
+VIEWS.stats = async function stats(main) {
+  const days = Number(store.get("statDays") || 30);
+  const st = await q(sb.rpc("web_stats", { p_days: days }));
+  const t = st.totals;
+  const contacts = t.leads + t.line_clicks + t.call_clicks;
+  const maxDay = Math.max(1, ...st.by_day.map((d) => d.pageviews));
+  const f = st.funnel;
+  const empty = !t.pageviews;
+  main.innerHTML = `<div class="page-head"><div><h1>สถิติเว็บ</h1><div class="sub">คนเข้าเว็บ impcar ${days} วันล่าสุด นับเองโดยระบบของร้าน</div></div></div>
+  <div class="filters">${seg("sd", [["7", "7 วัน"], ["30", "30 วัน"], ["90", "90 วัน"]], String(days))}</div>
+  ${empty ? `<div class="empty">ยังไม่มีข้อมูลการเข้าชมในช่วงนี้ ระบบเริ่มนับหลังเปิดใช้ระบบหลังบ้านบนเว็บจริง</div>` : `
+  <div class="money-strip" style="margin:0 0 6px">
+    <div><span>หน้าที่ถูกเปิด</span><b>${nf(t.pageviews)}</b></div>
+    <div><span>การเข้าชมที่ติดตามได้</span><b>${nf(t.sessions)}</b></div>
+    <div class="ok"><span>ติดต่อเข้ามา (ฟอร์ม LINE โทร)</span><b>${nf(contacts)}</b></div>
+    <div><span>เข้าชมแล้วติดต่อ</span><b>${pct(t.contact_sessions, t.sessions)}%</b></div>
+  </div>
+  <p class="hint">การเข้าชมที่ติดตามได้ = เฉพาะคนที่กดยอมรับคุกกี้ ส่วนจำนวนหน้าและการติดต่อนับทุกคน</p>
+
+  <h2>หน้าที่ถูกเปิดต่อวัน</h2>
+  <div class="card">
+    <div class="vchart" role="img" aria-label="จำนวนหน้าที่ถูกเปิดต่อวัน สูงสุด ${nf(maxDay)} หน้า">
+      <span class="vchart__max">${nf(maxDay)}</span>
+      <div class="vchart__bars">${st.by_day.map((d) => `<div class="vchart__col" data-tip="${esc(thDate(d.d))}: เปิด ${nf(d.pageviews)} หน้า ติดต่อ ${nf(d.contacts)} ครั้ง"><i style="height:${d.pageviews ? Math.max(2, (d.pageviews * 100) / maxDay) : 0}%"></i></div>`).join("")}</div>
+      <div class="vchart__x"><span>${thDate(st.by_day[0].d, false)}</span><span>${thDate(st.by_day[st.by_day.length - 1].d, false)}</span></div>
+    </div>
+    <details class="small" style="margin-top:10px"><summary>ดูเป็นตาราง</summary>
+      <div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><thead><tr><th>วันที่</th><th class="num">หน้าที่เปิด</th><th class="num">ติดต่อ</th></tr></thead>
+      <tbody>${st.by_day.slice().reverse().map((d) => `<tr><td>${thDate(d.d)}</td><td class="num">${nf(d.pageviews)}</td><td class="num">${nf(d.contacts)}</td></tr>`).join("")}</tbody></table></div></details>
+  </div>
+
+  <h2>จากเข้าเว็บ ถึงติดต่อร้าน</h2>
+  <div class="card">${hbars([
+    { label: "เข้าเว็บ", v: f.visited, extra: "100%" },
+    { label: "สนใจ: ดูรถ คำนวณรายได้ หรืออ่านเกินครึ่งหน้า", v: f.engaged, extra: pct(f.engaged, f.visited) + "%" },
+    { label: "เริ่มกรอกฟอร์มจอง", v: f.form, extra: pct(f.form, f.visited) + "%" },
+    { label: "ติดต่อ: ส่งฟอร์ม ทัก LINE หรือโทร", v: f.contacted, extra: pct(f.contacted, f.visited) + "%" },
+  ], { max: Math.max(1, f.visited), unit: "การเข้าชม" })}
+  <p class="hint" style="margin-top:8px">ขั้นไหนตกเยอะ คือจุดที่ควรปรับหน้าเว็บก่อน</p></div>
+
+  <h2>มาจากไหน</h2>
+  <div class="card">${hbars(st.sources.map((s) => ({ label: SOURCE_NAME[s.source] || s.source, v: s.pageviews, extra: s.contacts ? `ติดต่อ ${nf(s.contacts)}` : "" })), { unit: "หน้า" })}
+    ${st.requests_by_source.length ? `<p class="hint" style="margin-top:10px">คำขอจองจากฟอร์ม: ${st.requests_by_source.map((r) => `${esc(SOURCE_NAME[r.source] || r.source)} ${nf(r.n)}`).join(", ")}</p>` : ""}</div>
+
+  <div class="two-col">
+    <div><h2>หน้าที่คนเปิด</h2>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>หน้า</th><th class="num">เปิด</th><th class="num">อยู่เฉลี่ย</th><th class="num">อ่านถึง</th></tr></thead><tbody>
+      ${st.pages.map((p) => `<tr><td>${esc(PAGE_NAME[p.path] || p.path)}</td><td class="num">${nf(p.views)}</td><td class="num">${p.avg_secs != null ? nf(p.avg_secs) + " วิ" : "-"}</td><td class="num">${p.avg_depth != null ? p.avg_depth + "%" : "-"}</td></tr>`).join("")}
+      </tbody></table></div></div>
+    <div><h2>อุปกรณ์</h2>
+      <div class="card">${hbars(Object.entries(st.devices).filter(([k]) => k !== "unknown").map(([k, v]) => ({ label: { mobile: "มือถือ", tablet: "แท็บเล็ต", desktop: "คอมพิวเตอร์" }[k] || k, v })), { unit: "หน้า" })}</div>
+      <h2>รถที่คนกดดู</h2>
+      <div class="card">${st.cars.length ? hbars(st.cars.map((c) => { const car = carByNo(Number(c.car)); return { label: "คันที่ " + c.car, labelHtml: plate(car.id ? car : { no: Number(c.car) }, true), v: c.n, tip: `คันที่ ${c.car}: กดดู ${nf(c.n)} ครั้ง` }; }), { unit: "ครั้ง" }) : '<p class="hint">ยังไม่มีคนกดดูรถในช่วงนี้</p>'}</div>
+    </div>
+  </div>`}
+  <div class="tip" hidden></div>`;
+  bindSeg(main, "sd", "statDays");
+  const tip = main.querySelector(".tip");
+  main.addEventListener("mouseover", (e) => {
+    const el = e.target.closest("[data-tip]");
+    if (!el) { tip.hidden = true; return; }
+    tip.textContent = el.dataset.tip;
+    tip.hidden = false;
+  });
+  main.addEventListener("mousemove", (e) => { if (!tip.hidden) { tip.style.left = e.clientX + 14 + "px"; tip.style.top = e.clientY + 14 + "px"; } });
+  main.addEventListener("mouseleave", () => { tip.hidden = true; });
+};
+
+// ---------------------------------------------------------------- รถ
+VIEWS.cars = async function cars(main) {
+  S.cars = await q(sb.from("cars").select("*").order("no"));
+  main.innerHTML = `<div class="page-head"><div><h1>รถในร้าน</h1><div class="sub">${S.cars.filter((c) => c.active).length} คันที่เปิดรับจอง</div></div>
+    <div class="actions">${isOwner() ? '<button class="btn brand" data-new>+ เพิ่มรถ</button>' : ""}</div></div>
+    <div class="board">${S.cars.map((c) => `<div class="slot ${c.active ? "" : "maintenance"}" data-car="${c.id}" style="--st:${esc((COLORS[c.color] || {}).hex || "#ccc")}">
+      ${plate(c)}<span class="state">${swatch(c.color)} ${esc(colorName(c.color))}</span>
+      <span class="who">${c.active ? `เข้าร้าน ${thDate(c.arrived)}` : "ปิดรับจอง"}${c.note ? `, ${esc(c.note)}` : ""}</span>
+      ${isOwner() ? '<button class="btn small" data-edit>แก้ไข</button>' : ""}</div>`).join("") || '<div class="empty">ยังไม่มีรถ</div>'}</div>
+    <p class="hint" style="margin-top:12px">สีและสถานะรถแสดงบนหน้าเว็บ หลังแก้ไข ระบบอัปเดตเว็บให้เองภายใน 1–2 นาที</p>`;
+  main.querySelector("[data-new]")?.addEventListener("click", () => carDialog(null));
+  main.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-edit]")) return;
+    carDialog(S.cars.find((c) => c.id === Number(e.target.closest("[data-car]").dataset.car)));
+  });
+};
+
+function carDialog(c) {
+  const v = c || { no: (S.cars.reduce((m, x) => Math.max(m, x.no), 0) || 0) + 1, active: true, arrived: today() };
+  const body = openModal(`<h2>${c ? "แก้ไขรถคันที่ " + c.no : "เพิ่มรถ"}</h2><form class="form" id="car">
+    <div class="two"><label class="f"><span>คันที่</span><input name="no" type="number" min="1" required value="${esc(v.no)}"></label>
+      <label class="f"><span>สี</span><select name="color">${(CFG.colors || []).map((x) => `<option value="${esc(x.slug)}">${esc(x.name_th)}</option>`).join("")}</select></label></div>
+    <div class="two"><label class="f"><span>ทะเบียน</span><input name="plate" placeholder="เช่น 1กข 1234" value="${esc(v.plate || "")}"></label>
+      <label class="f"><span>วันที่รถเข้าร้าน</span><input name="arrived" type="date" value="${esc(v.arrived || "")}"></label></div>
+    <label class="f"><span>หมายเหตุ</span><input name="note" value="${esc(v.note || "")}"></label>
+    <label class="row"><input name="active" type="checkbox" ${v.active ? "checked" : ""}> เปิดรับจอง (แสดงบนเว็บ)</label>
+    ${formFoot("บันทึก")}</form>`);
+  const f = body.querySelector("#car");
+  if (v.color) f.color.value = v.color;
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(f.querySelector(".primary"), async () => {
+      const row = { no: Number(f.no.value), color: f.color.value, plate: f.plate.value || null, arrived: f.arrived.value || null, note: f.note.value || null, active: f.active.checked };
+      if (c) await q(sb.from("cars").update(row).eq("id", c.id)); else await q(sb.from("cars").insert(row));
+      closeModal(); toast("บันทึกแล้ว"); scheduleRebuild(); route();
+    });
+  });
+}
+
+// ---------------------------------------------------------------- พนักงาน (เจ้าของ)
+VIEWS.staff = async function staff(main) {
+  if (!isOwner()) return go("#dashboard");
+  S.staff = await q(sb.from("staff").select("*").order("created_at"));
+  main.innerHTML = `<div class="page-head"><div><h1>พนักงาน</h1><div class="sub">คนที่เข้าระบบหลังบ้านได้</div></div>
+    <div class="actions"><button class="btn brand" data-invite>+ เชิญพนักงาน</button></div></div>
+    <div class="list">${S.staff.map((s) => `<div class="item row" data-u="${esc(s.user_id)}"><span class="title">${esc(s.name)}</span>
+      ${pill(s.role === "owner" ? "monthly" : "confirmed", s.role === "owner" ? "เจ้าของ" : "พนักงาน")} ${s.active ? "" : pill("void", "ปิดใช้งาน")}
+      <span class="spacer"></span>${s.user_id === S.session.user.id ? '<span class="meta">บัญชีของคุณ</span>' : `
+      <button class="btn small" data-role>${s.role === "owner" ? "เปลี่ยนเป็นพนักงาน" : "ให้สิทธิ์เจ้าของ"}</button>
+      <button class="btn small ${s.active ? "danger" : ""}" data-active>${s.active ? "ปิดใช้งาน" : "เปิดใช้งาน"}</button>`}</div>`).join("")}</div>
+    <div class="card" style="margin-top:16px"><b>พนักงานทำอะไรได้บ้าง</b>
+      <p class="hint">ลงคิว ส่งรถ รับรถคืน รับเงินงวดที่ค้าง และอัปโหลดเอกสาร แต่แก้ราคาหรือส่วนลด ยกเลิกรายการเงิน ลบข้อมูล และจัดการรถ พนักงาน หรือตั้งค่าไม่ได้</p></div>`;
+  main.querySelector("[data-invite]").addEventListener("click", () => {
+    const body = openModal(`<h2>เชิญพนักงาน</h2><form class="form" id="inv">
+      <label class="f"><span>ชื่อที่แสดง</span><input name="name" required></label>
+      <label class="f"><span>อีเมล</span><input name="email" type="email" required>ระบบส่งลิงก์ให้พนักงานตั้งรหัสผ่านเอง</label>
+      <label class="f"><span>สิทธิ์</span><select name="role"><option value="staff">พนักงาน</option><option value="owner">เจ้าของ (ทำได้ทุกอย่าง)</option></select></label>
+      ${formFoot("ส่งคำเชิญ")}</form>`);
+    const f = body.querySelector("#inv");
+    f.addEventListener("submit", (e) => {
+      e.preventDefault();
+      withBusy(f.querySelector(".primary"), async () => {
+        const { data, error } = await sb.functions.invoke("invite-staff", { body: formData(f) });
+        if (error) {
+          let msg = error.message;
+          try { msg = (await error.context.json()).error || msg; } catch { /* ignore */ }
+          throw new Error(msg);
+        }
+        closeModal(); toast(data.message || "ส่งคำเชิญแล้ว"); route();
+      });
+    });
+  });
+  main.addEventListener("click", (e) => {
+    const row = e.target.closest("[data-u]");
+    if (!row) return;
+    const s = S.staff.find((x) => x.user_id === row.dataset.u);
+    if (e.target.closest("[data-role]")) withBusy(e.target, async () => { await q(sb.from("staff").update({ role: s.role === "owner" ? "staff" : "owner" }).eq("user_id", s.user_id)); route(); });
+    if (e.target.closest("[data-active]")) withBusy(e.target, async () => { await q(sb.from("staff").update({ active: !s.active }).eq("user_id", s.user_id)); route(); });
+  });
+};
+
+// ---------------------------------------------------------------- ตั้งค่า + PDPA + ประวัติแก้ไข (เจ้าของ)
+VIEWS.settings = async function settings(main) {
+  if (!isOwner()) return go("#dashboard");
+  const [st, dueDocs, stale, audit] = await Promise.all([
+    q(sb.from("settings").select("*").single()),
+    q(sb.from("v_documents_due_for_deletion").select("*").order("delete_after")),
+    q(sb.from("v_stale_leads").select("*").order("created_at")),
+    q(sb.rpc("audit_recent", { n: 60 })),
+  ]);
+  const TBL_TH = { bookings: "การจอง", payments: "เงิน", customers: "ลูกค้า", cars: "รถ", customer_documents: "เอกสาร", staff: "พนักงาน", settings: "ตั้งค่า", line_contacts: "แชต LINE" };
+  const ACT_TH = { insert: "เพิ่ม", update: "แก้", delete: "ลบ" };
+  main.innerHTML = `<div class="page-head"><div><h1>ตั้งค่า</h1><div class="sub">ราคา เอกสาร และประวัติการแก้ไข</div></div></div>
+  <form class="card form" id="stf">
+    <div class="two"><label class="f"><span>ราคารายวัน (บาท)</span><input name="daily_price" type="number" min="1" value="${st.daily_price}"></label>
+      <label class="f"><span>ราคารายเดือน (บาท)</span><input name="monthly_price" type="number" min="1" value="${st.monthly_price}"></label></div>
+    <div class="two"><label class="f"><span>สัญญารายเดือนขั้นต่ำ (เดือน)</span><input name="min_months" type="number" min="1" max="36" value="${st.min_months}"></label>
+      <label class="f"><span>มัดจำจอง (บาท)</span><input name="reservation_fee" type="number" min="0" value="${st.reservation_fee}"></label></div>
+    <label class="f"><span>ลบรูปเอกสารลูกค้าหลังสัญญาสุดท้ายจบ (วัน)</span><input name="doc_retention_days" type="number" min="1" max="3650" value="${st.doc_retention_days}"></label>
+    <p class="hint">ราคาที่นี่ใช้ในหลังบ้าน ราคาบนหน้าเว็บอยู่ใน site.config.json</p>
+    <div class="row"><span class="spacer"></span><button class="btn primary">บันทึกตั้งค่า</button></div>
+  </form>
+  <h2>หน้าเว็บ</h2>
+  <div class="card row"><span>ปฏิทินรถว่างบนเว็บอัปเดตเองหลังแก้การจอง</span><span class="spacer"></span><button class="btn" data-rebuild>อัปเดตเว็บตอนนี้</button></div>
+  <h2>PDPA</h2>
+  <div class="card"><b>รูปเอกสารที่ครบกำหนดลบ ${dueDocs.length} ไฟล์</b>
+    <div class="list" style="margin-top:8px">${dueDocs.map((d) => `<div class="meta">${esc(d.customer_name)}: ${esc(DOC_KIND_TH[d.kind])} ครบกำหนด ${thDate(d.delete_after)}</div>`).join("")}</div>
+    ${dueDocs.length ? '<button class="btn danger" style="margin-top:10px" data-purge>ลบเอกสารที่ครบกำหนดทั้งหมด</button>' : ""}</div>
+  <div class="card"><b>คนที่ทักมาแต่ไม่ได้เช่าเกิน 180 วัน ${stale.length} คน</b>
+    <div class="list" style="margin-top:8px">${stale.map((s) => `<div class="meta">${esc(s.full_name)} ${esc(SOURCE_TH[s.source] || "")} เมื่อ ${thDate(s.created_at)}</div>`).join("")}</div>
+    ${stale.length ? '<button class="btn danger" style="margin-top:10px" data-stale>ลบรายชื่อเหล่านี้</button>' : ""}</div>
+  <h2>ประวัติการแก้ไขล่าสุด</h2>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>เวลา</th><th>ใคร</th><th>ทำอะไร</th></tr></thead><tbody>
+  ${audit.map((a) => `<tr><td class="small">${thDateTime(a.at)}</td><td>${esc(a.actor_name)}</td><td>${ACT_TH[a.action] || esc(a.action)}${TBL_TH[a.tbl] || esc(a.tbl)} #${esc(a.row_id)}
+    ${a.action === "update" && a.old_row && a.new_row ? `<div class="small muted">${esc(Object.keys(a.new_row).filter((k) => k !== "updated_at" && JSON.stringify(a.old_row[k]) !== JSON.stringify(a.new_row[k])).slice(0, 4).join(", "))}</div>` : ""}</td></tr>`).join("")}
+  </tbody></table></div>`;
+  const f = main.querySelector("#stf");
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    withBusy(f.querySelector(".primary"), async () => {
+      const v = formData(f);
+      S.settings = await q(sb.from("settings").update(Object.fromEntries(Object.entries(v).map(([k, x]) => [k, Number(x)]))).eq("id", true).select().single());
+      toast("บันทึกตั้งค่าแล้ว");
+    });
+  });
+  main.querySelector("[data-rebuild]").addEventListener("click", (e) => withBusy(e.target, () => rebuildNow(true)));
+  main.querySelector("[data-purge]")?.addEventListener("click", async (e) => {
+    if (!(await ask(`ลบเอกสาร ${dueDocs.length} ไฟล์ถาวร?`, { danger: true, ok: "ลบถาวร" }))) return;
+    withBusy(e.target, async () => { await deleteDocs(dueDocs); toast("ลบแล้ว"); route(); });
+  });
+  main.querySelector("[data-stale]")?.addEventListener("click", async (e) => {
+    if (!(await ask(`ลบรายชื่อ ${stale.length} คนที่ไม่เคยเช่าถาวร?`, { danger: true, ok: "ลบถาวร" }))) return;
+    withBusy(e.target, async () => { await q(sb.from("customers").delete().in("id", stale.map((s) => s.id))); toast("ลบแล้ว"); route(); });
+  });
+};
+
+// ---------------------------------------------------------------- เริ่มทำงาน
+let realtime = null;
+async function start(session) {
+  S.session = session;
+  if (!session) {
+    S.me = null;
+    if (realtime) { sb.removeChannel(realtime); realtime = null; }
+    renderLogin();
+    return;
+  }
+  try {
+    S.me = await loadMe();
+  } catch (e) { fail(e); renderLogin(errMsg(e)); return; }
+  if (!S.me) {
+    app.innerHTML = `<div class="login-wrap"><div class="login"><h1>บัญชีนี้ยังไม่มีสิทธิ์</h1><p>${esc(session.user.email)} ยังไม่ได้รับสิทธิ์เข้าระบบหลังบ้าน ให้เจ้าของเชิญในเมนูพนักงาน</p>
+      <button class="btn" id="lo">ออกจากระบบ</button></div></div>`;
+    document.getElementById("lo").addEventListener("click", () => sb.auth.signOut());
+    return;
+  }
+  if (/access_token|type=/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#dashboard");
+  await route();
+  if (NEEDS_PASSWORD) askNewPassword();
+  if (!realtime) {
+    realtime = sb.channel("requests").on("postgres_changes", { event: "INSERT", schema: "public", table: "booking_requests" }, (p) => {
+      if (p.new && p.new.status === "new") {
+        toast(`คำขอจองใหม่จาก ${p.new.name || p.new.phone || "เว็บ"}`);
+        refreshBadge();
+        if (location.hash.startsWith("#requests") || location.hash.startsWith("#dashboard")) route();
+      }
+    }).subscribe();
+  }
+}
+
+window.addEventListener("hashchange", () => { if (S.me && !/access_token/.test(location.hash)) route(); });
+let lastUser;
+sb.auth.onAuthStateChange((event, session) => {
+  const uid = session ? session.user.id : null;
+  if (event === "PASSWORD_RECOVERY") setTimeout(askNewPassword, 300);
+  if (uid === lastUser && event !== "INITIAL_SESSION") return;
+  lastUser = uid;
+  setTimeout(() => start(session), 0);
+});
+
+})();
+</script>
+</body>
+</html>
